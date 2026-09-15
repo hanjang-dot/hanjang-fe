@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "한장",
+    "slug": "hanjang-fo",
+    "scheme": "hanjang",
+    "version": "0.1.0",
+    "orientation": "default",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "backgroundColor": "#F3EBDD",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hanjang.fo"
+    },
+    "android": {
+      "package": "com.hanjang.fo"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
