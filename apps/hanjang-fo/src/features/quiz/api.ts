@@ -1,4 +1,8 @@
-import type { QuizSet } from "./types";
+import { Effect } from "effect";
+
+import { hanjangApi } from "@/shared/api-client";
+
+import type { Quiz, QuizSet } from "./types";
 
 const MOCK_LATENCY_MS = 150;
 
@@ -81,7 +85,29 @@ const MOCK_QUIZ_SET: QuizSet = {
   ],
 };
 
-export const fetchTodayQuizSet = (): Promise<QuizSet> =>
-  new Promise((resolve) => {
+const toQuiz = (quiz: {
+  quizId: string;
+  type: string;
+  prompt: string;
+  choices: string[];
+  direction?: string;
+}): Quiz => ({
+  quizId: quiz.quizId,
+  type: quiz.type as Quiz["type"],
+  prompt: quiz.prompt,
+  choices: quiz.choices,
+  direction: quiz.direction as Quiz["direction"],
+});
+
+export const fetchTodayQuizSet = (): Promise<QuizSet> => {
+  if (hanjangApi) {
+    return Effect.runPromise(hanjangApi.quizzes.today()).then((quizzes) => ({
+      quizSetId: "quiz-set-today",
+      title: "오늘의 퀴즈",
+      quizzes: quizzes.map(toQuiz),
+    }));
+  }
+  return new Promise((resolve) => {
     setTimeout(() => resolve(MOCK_QUIZ_SET), MOCK_LATENCY_MS);
   });
+};

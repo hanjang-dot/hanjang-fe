@@ -1,0 +1,43 @@
+url: ${BO_URL}
+env:
+  ADMIN_ID: "root"
+  ADMIN_PASSWORD: "hanjang-root-dev"
+---
+- launchApp:
+    clearState: true
+- runFlow: ../subflows/login.yaml
+- runFlow: ../subflows/create-exam.yaml
+- tapOn: "문항 추가"
+- assertVisible: "문항 번호"
+- tapOn:
+    css: "#question-number"
+- inputText: "1"
+- tapOn:
+    css: "#question-prompt"
+- inputText: "다음 중 알맞은 것은?"
+- scrollUntilVisible:
+    element:
+      css: "#question-choice-0"
+- tapOn:
+    css: "#question-choice-0"
+- inputText: "선지1"
+- tapOn:
+    css: "#question-choice-1"
+- inputText: "선지2"
+- tapOn:
+    css: "#question-choice-2"
+- inputText: "선지3"
+- tapOn:
+    css: "#question-choice-3"
+- inputText: "선지4"
+- tapOn:
+    css: "#question-choice-4"
+- inputText: "선지5"
+- scrollUntilVisible:
+    element:
+      css: "#question-answer"
+- tapOn:
+    css: "#question-answer"
+- inputText: "선지1"
+- pressKey: enter
+- assertVisible: "다음 중 알맞은 것은?"

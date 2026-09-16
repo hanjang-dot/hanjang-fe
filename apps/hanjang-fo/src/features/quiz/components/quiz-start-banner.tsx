@@ -15,11 +15,11 @@ import { Button } from "@/shared/components";
 const QuizStartBanner = () => {
   const router = useRouter();
   const { data } = useTodayQuizSet();
-  const reset = useQuizRunStore((state) => state.reset);
+  const begin = useQuizRunStore((state) => state.begin);
   const variant = useExperiment(EXPERIMENTS.homeStartCta);
   const start = () => {
     trackExperimentEvent(EXPERIMENTS.homeStartCta, "conversion", { variant });
-    reset();
+    begin(data?.quizzes.map((quiz) => quiz.quizId) ?? []);
     router.push("/quiz");
   };
   return (

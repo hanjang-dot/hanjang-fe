@@ -26,7 +26,7 @@ const InviteAcceptPage = ({ token }: { token: string }) => {
     }
     setLocalError("");
     accept.mutate(
-      { token, id: adminId.trim(), password },
+      { token, loginId: adminId.trim(), password },
       { onSuccess: () => navigate({ to: ROUTES.login, replace: true }) },
     );
   };

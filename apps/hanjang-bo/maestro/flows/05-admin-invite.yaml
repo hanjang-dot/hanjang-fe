@@ -1,0 +1,41 @@
+url: ${BO_URL}
+env:
+  ADMIN_ID: "root"
+  ADMIN_PASSWORD: "hanjang-root-dev"
+  NEW_ADMIN_PASSWORD: "e2e-pass-1234"
+---
+- launchApp:
+    clearState: true
+- runFlow: ../subflows/login.yaml
+- tapOn:
+    css: "nav a[href='/admins/invite']"
+- assertVisible: "관리자 초대"
+- tapOn: "초대 링크 생성"
+- assertVisible:
+    css: "#invite-url"
+- copyTextFrom:
+    css: "#invite-url"
+- openLink: ${maestro.copiedText}
+- assertVisible: "관리자 계정 만들기"
+- evalScript: ${output.newAdminId = "e2e" + Date.now()}
+- tapOn:
+    css: "#invite-id"
+- inputText: ${output.newAdminId}
+- tapOn:
+    css: "#invite-password"
+- inputText: ${NEW_ADMIN_PASSWORD}
+- tapOn:
+    css: "#invite-password-confirm"
+- inputText: ${NEW_ADMIN_PASSWORD}
+- tapOn:
+    css: "button[type='submit']"
+- assertVisible: "한장 BO 로그인"
+- tapOn:
+    css: "#admin-id"
+- inputText: ${output.newAdminId}
+- tapOn:
+    css: "#admin-password"
+- inputText: ${NEW_ADMIN_PASSWORD}
+- tapOn:
+    css: "button[type='submit']"
+- assertVisible: "새 시험지"

@@ -1,0 +1,12 @@
+url: ${BO_URL}
+---
+- assertVisible: "한장 BO 로그인"
+- tapOn:
+    css: "#admin-id"
+- inputText: ${ADMIN_ID}
+- tapOn:
+    css: "#admin-password"
+- inputText: ${ADMIN_PASSWORD}
+- tapOn:
+    css: "button[type='submit']"
+- assertVisible: "새 시험지"

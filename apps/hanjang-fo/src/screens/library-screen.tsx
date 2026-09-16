@@ -70,6 +70,7 @@ const LibraryScreen = () => {
             <ExamCard
               paper={paper}
               bookmarked={bookmarkIds.includes(paper.examId)}
+              primaryAction
               onPress={() => router.push(`/exam/${paper.examId}`)}
               onToggleBookmark={() => toggleBookmark(paper.examId)}
             />

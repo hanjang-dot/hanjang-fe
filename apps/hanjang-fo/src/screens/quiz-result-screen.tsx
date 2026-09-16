@@ -57,10 +57,10 @@ const QuizResultScreen = () => {
   const results = quizzes
     .map((quiz) => answers[quiz.quizId])
     .filter((answer) => answer !== undefined);
-  const correct = results.filter((answer) => answer.correct).length;
+  const correct = results.filter((answer) => answer.correct === true).length;
   const wrong = quizzes
     .map((quiz) => ({ quiz, answer: answers[quiz.quizId] }))
-    .filter(({ answer }) => answer && !answer.correct);
+    .filter(({ answer }) => answer && answer.correct === false);
 
   return (
     <View style={styles.root}>
@@ -103,8 +103,12 @@ const QuizResultScreen = () => {
                 {wrong.map(({ quiz, answer }) => (
                   <ListRow
                     key={quiz.quizId}
-                    title={`${quiz.prompt} — ${quiz.choices[quiz.answerIndex]}`}
-                    meta={`오답: ${quiz.choices[answer?.choiceIndex ?? -1] ?? "-"} 선택`}
+                    title={
+                      quiz.answerIndex !== undefined
+                        ? `${quiz.prompt} — ${quiz.choices[quiz.answerIndex]}`
+                        : quiz.prompt
+                    }
+                    meta={`내 선택: ${quiz.choices[answer?.choiceIndex ?? -1] ?? "-"}`}
                   />
                 ))}
               </View>

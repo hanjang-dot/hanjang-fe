@@ -7,7 +7,6 @@ import { Button, ListRow } from "@/shared/components";
 
 const PROVIDER_LABELS: Record<string, string> = {
   kakao: "카카오",
-  phone: "전화번호",
 };
 
 const MyScreen = () => {
@@ -19,7 +18,9 @@ const MyScreen = () => {
         <ListRow
           title="계정"
           meta={
-            user ? `${PROVIDER_LABELS[user.provider]} 연결됨` : "미연결"
+            user
+              ? `${PROVIDER_LABELS[user.provider]} 연결됨${user.email ? ` · ${user.email}` : ""}`
+              : "미연결"
           }
         />
         <ListRow title="앱 버전" meta={version} />

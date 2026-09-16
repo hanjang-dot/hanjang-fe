@@ -1,18 +1,62 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Cause, Exit } from "effect";
+import { Cause, Effect, Exit } from "effect";
 
-import { gradeClient as defaultGradeClient } from "./api";
+import { gradeClient as defaultGradeClient, sessionClient } from "./api";
 import { initSessionTable, loadSessions } from "./db";
 import { createGradeGate } from "./grade-run";
-import { useSessionStore } from "./store";
+import { remoteDetailToLocal, useSessionStore } from "./store";
 
 import type { GradeGate } from "./grade-run";
-import type {
-  ExamSession,
-  GradeClient,
-  GradeVariant,
-} from "./types";
+import type { ExamSession, GradeClient, GradeVariant } from "./types";
 import type { Question } from "@/features/exam";
+
+const syncRemoteSessions = async () => {
+  const client = sessionClient;
+  if (!client) return;
+  try {
+    const list = await Effect.runPromise(client.listSessions());
+    const items = (
+      await Promise.all(
+        list.map((remote) =>
+          Effect.runPromise(client.detail(remote.remoteId)).catch(
+            () => null,
+          ),
+        ),
+      )
+    )
+      .filter((detail) => detail !== null)
+      .map((detail) => ({
+        session: remoteDetailToLocal(detail),
+        grades: detail.grades,
+      }));
+    useSessionStore.getState().mergeRemote(items);
+
+    const pending = Object.values(useSessionStore.getState().sessions).filter(
+      (session) => !session.remoteId && session.status !== "graded",
+    );
+    for (const session of pending) {
+      try {
+        const remote = await Effect.runPromise(
+          client.createSession(session.examId),
+        );
+        useSessionStore
+          .getState()
+          .attachRemote(session.sessionId, remote.remoteId, remote.deadlineAt);
+        await Promise.all(
+          Object.entries(session.answers).map(([questionId, choice]) =>
+            Effect.runPromise(
+              client.saveAnswer(remote.remoteId, questionId, choice),
+            ).catch(() => undefined),
+          ),
+        );
+      } catch (error) {
+        console.warn("session push failed", error);
+      }
+    }
+  } catch (error) {
+    console.warn("session remote sync failed", error);
+  }
+};
 
 export const useHydrateSessions = () => {
   const hydrate = useSessionStore((state) => state.hydrate);
@@ -24,8 +68,12 @@ export const useHydrateSessions = () => {
       console.warn("session restore failed", error);
       hydrate([]);
     }
+    void syncRemoteSessions();
   }, [hydrate]);
 };
+
+const isLive = (session: ExamSession) =>
+  session.status === "idle" || session.status === "restoring";
 
 export const useExamSession = (
   examId: string,
@@ -34,7 +82,7 @@ export const useExamSession = (
   const hydrated = useSessionStore((state) => state.hydrated);
   const session = useSessionStore((state) =>
     Object.values(state.sessions).find(
-      (item) => item.examId === examId && item.status !== "graded",
+      (item) => item.examId === examId && isLive(item),
     ),
   );
   const startSession = useSessionStore((state) => state.startSession);
@@ -50,9 +98,7 @@ export const useExamSession = (
 export const useActiveSession = (): ExamSession | null =>
   useSessionStore(
     (state) =>
-      Object.values(state.sessions).find(
-        (session) => session.status !== "graded",
-      ) ?? null,
+      Object.values(state.sessions).find(isLive) ?? null,
   );
 
 export const useSession = (sessionId: string): ExamSession | null =>
@@ -86,13 +132,19 @@ export const useGradeChoice = (
 
   const choose = useCallback(
     (choiceId: string) => {
-      if (!hydrated || session.status === "restoring") return;
+      if (!hydrated) return;
       if (variant === "grading") return;
+      if (!session.remoteId) {
+        setAnswer(session.sessionId, question.questionId, choiceId);
+        setVariant("graded");
+        return;
+      }
       const runId = gate.nextRunId();
       const run = gate.start(
         runId,
         client.grade({
           runId,
+          examSessionId: session.remoteId,
           questionId: question.questionId,
           choiceId,
           correctChoiceId: question.correctChoiceId,

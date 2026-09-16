@@ -1,11 +1,13 @@
 export interface ExamPaper {
   examId: string;
-  year: number;
+  year: number | null;
   title: string;
   subject: string;
+  round?: string;
+  coverImageUrl?: string;
   timeLimitSec: number;
-  questionCount: number;
-  publishedAt: string;
+  questionCount?: number;
+  publishedAt: string | null;
 }
 
 export interface QuestionChoice {
@@ -18,10 +20,11 @@ export interface Question {
   questionId: string;
   number: number;
   passage: string;
+  passageImageUrl?: string;
   passageImageHeight?: number;
   prompt: string;
   choices: QuestionChoice[];
-  correctChoiceId: string;
+  correctChoiceId?: string;
 }
 
 export interface ExamDetail {

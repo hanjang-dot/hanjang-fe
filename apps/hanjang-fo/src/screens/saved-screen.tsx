@@ -36,6 +36,8 @@ const SavedScreen = () => {
             <ExamCard
               paper={paper}
               bookmarked
+              primaryAction
+              desc="북마크됨"
               onPress={() => router.push(`/exam/${paper.examId}`)}
               onToggleBookmark={() => toggleBookmark(paper.examId)}
             />

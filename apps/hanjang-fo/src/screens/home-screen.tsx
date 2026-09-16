@@ -12,6 +12,7 @@ import { QuizSetCard, QuizStartBanner } from "@/features/quiz";
 import { useActiveSession } from "@/features/session";
 import {
   Button,
+  EmptyState,
   ErrorState,
   ProgressBar,
   SkeletonCard,
@@ -90,6 +91,14 @@ const HomeScreen = () => {
       ) : null}
       <ReviewPromptCard />
       {homeStartCtaVariant === "A" ? <QuizSetCard /> : null}
+      {!activeSession && papers.length === 0 ? (
+        <EmptyState
+          icon="inbox"
+          desc="진행 중인 시험이 없어요"
+          actionLabel="자료실에서 고르기"
+          onAction={() => router.push("/library")}
+        />
+      ) : null}
       {latest ? (
         <Pressable
           accessibilityRole="button"
