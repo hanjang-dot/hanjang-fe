@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Cause, Effect, Exit } from "effect";
+import { useShallow } from "zustand/react/shallow";
 
 import { gradeClient as defaultGradeClient, sessionClient } from "./api";
 import { initSessionTable, loadSessions } from "./db";
@@ -105,14 +106,18 @@ export const useSession = (sessionId: string): ExamSession | null =>
   useSessionStore((state) => state.sessions[sessionId] ?? null);
 
 export const useGradedSessions = (): ExamSession[] =>
-  useSessionStore((state) =>
-    Object.values(state.sessions).filter(
-      (session) => session.status === "graded",
+  useSessionStore(
+    useShallow((state) =>
+      Object.values(state.sessions).filter(
+        (session) => session.status === "graded",
+      ),
     ),
   );
 
+const EMPTY_GRADES = {};
+
 export const useSessionGrades = (sessionId: string) =>
-  useSessionStore((state) => state.grades[sessionId] ?? {});
+  useSessionStore((state) => state.grades[sessionId] ?? EMPTY_GRADES);
 
 export const useGradeChoice = (
   session: ExamSession,
