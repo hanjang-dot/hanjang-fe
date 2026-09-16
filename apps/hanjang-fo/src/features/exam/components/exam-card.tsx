@@ -10,6 +10,7 @@ interface ExamCardProps {
   bookmarked: boolean;
   primaryAction?: boolean;
   actionLabel?: string;
+  desc?: string;
   onPress: () => void;
   onToggleBookmark: () => void;
 }
@@ -19,13 +20,14 @@ const ExamCard = ({
   bookmarked,
   primaryAction = false,
   actionLabel = "풀기",
+  desc,
   onPress,
   onToggleBookmark,
 }: ExamCardProps) => (
   <Card
     onPress={onPress}
     title={paper.title}
-    desc={paper.subject}
+    desc={desc ?? paper.subject}
     meta={`${Math.round(paper.timeLimitSec / 60)}분`}
     action={
       <View style={styles.actions}>

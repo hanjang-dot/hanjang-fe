@@ -1,1 +1,2 @@
-export const GRAPHQL_ENDPOINT = "/graphql";
+export * from "./client";
+export * from "./types";

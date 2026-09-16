@@ -18,6 +18,7 @@ export const initSessionTable = () => {
   getDb().execSync(
     `CREATE TABLE IF NOT EXISTS exam_session (
       session_id TEXT PRIMARY KEY,
+      remote_id TEXT,
       exam_id TEXT NOT NULL,
       deadline_at INTEGER NOT NULL,
       answers TEXT NOT NULL,
@@ -26,16 +27,24 @@ export const initSessionTable = () => {
       status TEXT NOT NULL
     )`,
   );
+  try {
+    getDb().execSync(
+      `ALTER TABLE exam_session ADD COLUMN remote_id TEXT`,
+    );
+  } catch {
+    void 0;
+  }
 };
 
 export const saveSession = (session: ExamSession) => {
   const row = sessionToRow(session);
   getDb().runSync(
     `INSERT OR REPLACE INTO exam_session
-      (session_id, exam_id, deadline_at, answers, ink_draft, schema_version, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      (session_id, remote_id, exam_id, deadline_at, answers, ink_draft, schema_version, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       row.session_id,
+      row.remote_id,
       row.exam_id,
       row.deadline_at,
       row.answers,

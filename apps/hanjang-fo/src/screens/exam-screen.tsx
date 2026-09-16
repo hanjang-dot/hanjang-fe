@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { useIsOffline } from "@/shared/hooks";
 import { Stack, useRouter } from "expo-router";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
@@ -46,10 +48,16 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
       },
     ]);
 
+  const [submitting, setSubmitting] = useState(false);
+
   const submit = () => {
-    if (!session) return;
-    submitSession(session.sessionId);
-    router.replace(`/exam-result/${session.sessionId}`);
+    if (!session || submitting) return;
+    setSubmitting(true);
+    submitSession(session.sessionId)
+      .catch(() => undefined)
+      .finally(() => {
+        router.replace(`/exam-result/${session.sessionId}`);
+      });
   };
 
   const headerLeft = () => (
@@ -122,8 +130,13 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
           <View style={styles.panes}>
             <PassagePane
               questions={data.questions}
+              strokes={session.inkDraft}
               onStroke={(points) =>
-                addStroke(session.sessionId, { points })
+                addStroke(
+                  session.sessionId,
+                  { points },
+                  data.questions[0]?.questionId,
+                )
               }
             />
             <ScrollView style={styles.questions}>
@@ -142,6 +155,7 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
               variant="primary"
               size="lg"
               full
+              loading={submitting}
               onPress={submit}
             />
           </BottomCta>

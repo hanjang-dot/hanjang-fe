@@ -2,13 +2,13 @@ import { Effect } from "effect";
 
 import { API_BASE_URL } from "@/shared/config";
 
-import { createKyExamClient } from "./exam-client";
+import { createRemoteExamClient } from "./exam-client";
 import { createMockExamClient } from "./mock-exam-client";
 
 import type { ExamClient } from "./exam-client";
 
 const examClient: ExamClient = API_BASE_URL
-  ? createKyExamClient(API_BASE_URL)
+  ? createRemoteExamClient()
   : createMockExamClient();
 
 export const fetchExamPapers = () =>

@@ -44,7 +44,7 @@ const ChoiceButton = ({
       {state === "wrong" ? (
         <View style={styles.mark}>
           <Icon name="x" size={20} color={styles.wrongMark.color} />
-          <Text style={[styles.markText, styles.wrongMark]}>오답</Text>
+          <Text style={[styles.markText, styles.wrongMark]}>내 선택</Text>
         </View>
       ) : null}
     </Pressable>

@@ -1,18 +1,36 @@
+import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useAuth } from "@/features/auth";
-import { Button, BottomCta } from "@/shared/components";
-
-import type { AuthProvider } from "@/features/auth";
+import { Button, BottomCta, ErrorState } from "@/shared/components";
 
 const LoginScreen = () => {
   const router = useRouter();
-  const { signIn } = useAuth();
-  const enter = (provider: AuthProvider) => {
-    void signIn(provider).then(() => router.replace("/"));
+  const { signingIn, error, signInKakao } = useAuth();
+  const [failed, setFailed] = useState(false);
+
+  const enter = () => {
+    setFailed(false);
+    signInKakao()
+      .then((status) => {
+        if (status === "ok") router.replace("/");
+      })
+      .catch(() => setFailed(true));
   };
+
+  if (failed) {
+    return (
+      <View style={styles.root}>
+        <ErrorState
+          desc="로그인하지 못했어요 다시 시도할 수 있어요"
+          onRetry={() => setFailed(false)}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.root}>
       <View style={styles.hero}>
@@ -27,15 +45,10 @@ const LoginScreen = () => {
           variant="primary"
           size="lg"
           full
-          onPress={() => enter("kakao")}
+          loading={signingIn}
+          onPress={enter}
         />
-        <Button
-          label="전화번호로 시작"
-          variant="secondary"
-          size="lg"
-          full
-          onPress={() => enter("phone")}
-        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
       </BottomCta>
     </View>
   );
@@ -60,6 +73,11 @@ const styles = StyleSheet.create((theme) => ({
   tagline: {
     ...theme.typography.body,
     color: theme.colors.textMuted,
+    textAlign: "center",
+  },
+  error: {
+    ...theme.typography.caption,
+    color: theme.colors.danger,
     textAlign: "center",
   },
 }));

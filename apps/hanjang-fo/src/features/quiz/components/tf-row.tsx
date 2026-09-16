@@ -7,25 +7,25 @@ const MARKS = ["O", "X"] as const;
 
 interface TfRowProps {
   selectedIndex: number | null;
-  answerIndex: number | null;
+  correct: boolean | null;
   onSelect: (index: number) => void;
 }
 
 const markState = (
   index: number,
   selectedIndex: number | null,
-  answerIndex: number | null,
+  correct: boolean | null,
 ): ChoiceState => {
-  if (selectedIndex === null || answerIndex === null) return "default";
-  if (index === answerIndex) return "correct";
-  if (index === selectedIndex) return "wrong";
-  return "default";
+  if (selectedIndex === null) return "default";
+  if (index !== selectedIndex) return "disabled";
+  if (correct === null) return "selected";
+  return correct ? "correct" : "wrong";
 };
 
-const TfRow = ({ selectedIndex, answerIndex, onSelect }: TfRowProps) => (
+const TfRow = ({ selectedIndex, correct, onSelect }: TfRowProps) => (
   <View style={styles.row}>
     {MARKS.map((mark, index) => {
-      const state = markState(index, selectedIndex, answerIndex);
+      const state = markState(index, selectedIndex, correct);
       return (
         <Pressable
           key={mark}
@@ -60,15 +60,20 @@ const styles = StyleSheet.create((theme) => ({
         ? theme.colors.correctSoft
         : state === "wrong"
           ? theme.colors.dangerSoft
-          : theme.colors.surface1,
+          : state === "selected"
+            ? theme.colors.accentSoft
+            : theme.colors.surface1,
     borderWidth: 1,
     borderColor:
       state === "correct"
         ? theme.colors.correct
         : state === "wrong"
           ? theme.colors.danger
-          : theme.colors.border,
+          : state === "selected"
+            ? theme.colors.accent
+            : theme.colors.border,
     borderRadius: theme.radius.lg,
+    opacity: state === "disabled" ? 0.4 : 1,
   }),
   pressed: {
     backgroundColor: theme.colors.surface2,
@@ -80,7 +85,9 @@ const styles = StyleSheet.create((theme) => ({
         ? theme.colors.correct
         : state === "wrong"
           ? theme.colors.danger
-          : theme.colors.text,
+          : state === "selected"
+            ? theme.colors.accent
+            : theme.colors.text,
   }),
 }));
 

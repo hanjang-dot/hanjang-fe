@@ -7,7 +7,7 @@ export interface Quiz {
   type: QuizType;
   prompt: string;
   choices: string[];
-  answerIndex: number;
+  answerIndex?: number;
   direction?: QuizDirection;
 }
 
@@ -20,7 +20,7 @@ export interface QuizSet {
 export interface QuizAnswer {
   quizId: string;
   choiceIndex: number;
-  correct: boolean;
+  correct: boolean | null;
 }
 
 export interface QuizAttempt {

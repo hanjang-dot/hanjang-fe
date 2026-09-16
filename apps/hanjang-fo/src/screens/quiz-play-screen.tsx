@@ -46,6 +46,7 @@ const QuizPlayScreen = () => {
   const index = useQuizRunStore((state) => state.index);
   const answers = useQuizRunStore((state) => state.answers);
   const select = useQuizRunStore((state) => state.select);
+  const submit = useQuizRunStore((state) => state.submit);
   const next = useQuizRunStore((state) => state.next);
 
   const quizzes = quizSet?.quizzes ?? [];
@@ -65,6 +66,7 @@ const QuizPlayScreen = () => {
 
   const advance = () => {
     if (isLast) {
+      submit();
       router.replace("/quiz-result");
       return;
     }
@@ -73,9 +75,9 @@ const QuizPlayScreen = () => {
 
   const choiceState = (choiceIndex: number): ChoiceState => {
     if (!answer || !quiz) return "default";
-    if (choiceIndex === quiz.answerIndex) return "correct";
-    if (choiceIndex === answer.choiceIndex) return "wrong";
-    return "default";
+    if (choiceIndex !== answer.choiceIndex) return "disabled";
+    if (answer.correct === null) return "selected";
+    return answer.correct ? "correct" : "wrong";
   };
 
   const headerLeft = () => (
@@ -149,12 +151,12 @@ const QuizPlayScreen = () => {
                 <Text style={styles.direction}>{directionLabel(quiz)}</Text>
               ) : null}
               <Text style={styles.prompt}>{quizPrompt(quiz)}</Text>
-              <Text style={styles.desc}>다음 중 알맞은 것을 고르세요</Text>
+              <Text style={styles.desc}>다음 중 알맞은 뜻을 고르세요</Text>
             </View>
             {quiz.type === "ox" ? (
               <TfRow
                 selectedIndex={answer?.choiceIndex ?? null}
-                answerIndex={answer ? quiz.answerIndex : null}
+                correct={answer?.correct ?? null}
                 onSelect={(choiceIndex) => select(quiz, choiceIndex)}
               />
             ) : (

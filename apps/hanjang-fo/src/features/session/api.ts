@@ -1,16 +1,16 @@
-import { API_BASE_URL } from "@/shared/config";
+import { hanjangApi } from "@/shared/api-client";
 
 import { GRADE_LATENCY_MS } from "./constants";
-import { createKyGradeClient } from "./grade-client";
+import { createRemoteGradeClient } from "./grade-client";
 import { createMockGradeClient } from "./mock-grade-client";
-import { createKySessionClient } from "./session-client";
+import { createRemoteSessionClient } from "./session-client";
 
 import type { GradeClient } from "./types";
 
-export const gradeClient: GradeClient = API_BASE_URL
-  ? createKyGradeClient(API_BASE_URL)
+export const gradeClient: GradeClient = hanjangApi
+  ? createRemoteGradeClient()
   : createMockGradeClient({ latencyMs: GRADE_LATENCY_MS });
 
-export const sessionClient = API_BASE_URL
-  ? createKySessionClient(API_BASE_URL)
+export const sessionClient = hanjangApi
+  ? createRemoteSessionClient()
   : null;

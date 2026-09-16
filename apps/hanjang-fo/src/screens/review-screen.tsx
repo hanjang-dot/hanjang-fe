@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useExamPapers } from "@/features/exam";
 import { useGradedSessions, useSessionStore } from "@/features/session";
 import { Button, EmptyState, SkeletonCard } from "@/shared/components";
+import { formatRelativeDay } from "@/shared/utils";
 
 const ReviewScreen = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ const ReviewScreen = () => {
         </View>
       ) : sessions.length === 0 ? (
         <EmptyState
-          icon="history"
+          icon="inbox"
           desc="채점이 끝난 세션이 없습니다"
           actionLabel="시험지 풀기"
           onAction={() => router.push("/library")}
@@ -33,7 +34,7 @@ const ReviewScreen = () => {
           keyExtractor={(session) => session.sessionId}
           recycleItems
           contentContainerStyle={styles.listContent}
-          renderItem={({ item: session }) => {
+          renderItem={({ item: session, index }) => {
             const paper = papers.find(
               (item) => item.examId === session.examId,
             );
@@ -47,12 +48,13 @@ const ReviewScreen = () => {
                   </Text>
                   <Text style={styles.desc}>채점 완료</Text>
                   <Text style={styles.caption}>
-                    정답 {correct}/{results.length}
+                    정답 {correct}/{results.length} ·{" "}
+                    {formatRelativeDay(session.deadlineAt)}
                   </Text>
                 </View>
                 <Button
                   label="다시 보기"
-                  variant="primary"
+                  variant={index === 0 ? "primary" : "secondary"}
                   size="md"
                   onPress={() =>
                     router.push(`/exam-result/${session.sessionId}`)

@@ -15,6 +15,7 @@ export interface Stroke {
 
 export interface ExamSession {
   sessionId: string;
+  remoteId?: string;
   examId: string;
   deadlineAt: number;
   answers: Record<string, string>;
@@ -32,9 +33,10 @@ export interface GradeResult {
 
 export interface GradeRequest {
   runId: string;
+  examSessionId: string;
   questionId: string;
   choiceId: string;
-  correctChoiceId: string;
+  correctChoiceId?: string;
 }
 
 export interface GradeClient {
