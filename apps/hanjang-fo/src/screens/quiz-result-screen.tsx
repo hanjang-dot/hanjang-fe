@@ -2,6 +2,11 @@ import { Stack, useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import {
+  EXPERIMENTS,
+  trackExperimentEvent,
+  useExperiment,
+} from "@/features/experiments";
 import { useQuizRunStore, useTodayQuizSet } from "@/features/quiz";
 import {
   Button,
@@ -19,10 +24,21 @@ const QuizResultScreen = () => {
   const { data: quizSet, isLoading, isError, refetch } = useTodayQuizSet();
   const reset = useQuizRunStore((state) => state.reset);
   const answers = useQuizRunStore((state) => state.answers);
+  const ctaVariant = useExperiment(EXPERIMENTS.quizResultCta);
 
   const goHome = () => {
     reset();
     router.dismissTo("/");
+  };
+
+  const replay = () => {
+    reset();
+    router.replace("/quiz");
+  };
+
+  const startNextSet = () => {
+    trackExperimentEvent(EXPERIMENTS.quizResultCta, "conversion");
+    replay();
   };
 
   const headerLeft = () => (
@@ -97,13 +113,31 @@ const QuizResultScreen = () => {
             )}
           </ScrollView>
           <BottomCta>
-            <Button
-              label="홈으로"
-              variant="primary"
-              size="lg"
-              full
-              onPress={goHome}
-            />
+            {ctaVariant === "B" ? (
+              <>
+                <Button
+                  label="다시 풀기"
+                  variant="secondary"
+                  size="lg"
+                  onPress={replay}
+                />
+                <Button
+                  label="다음 세트 시작"
+                  variant="primary"
+                  size="lg"
+                  full
+                  onPress={startNextSet}
+                />
+              </>
+            ) : (
+              <Button
+                label="다시 풀기"
+                variant="primary"
+                size="lg"
+                full
+                onPress={replay}
+              />
+            )}
           </BottomCta>
         </>
       )}
