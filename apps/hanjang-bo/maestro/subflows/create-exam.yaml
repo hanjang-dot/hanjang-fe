@@ -1,0 +1,21 @@
+url: ${BO_URL}
+---
+- evalScript: ${output.round = "e2e-" + Date.now()}
+- tapOn: "새 시험지"
+- assertVisible: "회차"
+- tapOn:
+    css: "#exam-round"
+- inputText: ${output.round}
+- tapOn:
+    css: "#exam-subject"
+- inputText: "국어"
+- tapOn:
+    css: "#exam-year"
+- inputText: "2025"
+- tapOn:
+    css: "#exam-limit"
+- inputText: "60"
+- tapOn:
+    css: "button[type='submit']"
+- assertVisible: ${output.round}
+- assertVisible: "문항"

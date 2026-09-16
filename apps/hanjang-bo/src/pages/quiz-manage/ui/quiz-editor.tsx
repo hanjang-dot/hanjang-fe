@@ -75,6 +75,7 @@ const QuizEditor = ({ quiz, onDone }: { quiz: Quiz | null; onDone: () => void })
       <div className="field">
         <label className="label">유형</label>
         <select
+          id="quiz-type"
           className="select"
           value={draft.type}
           onChange={(event) => onTypeChange(event.target.value as QuizType)}
@@ -88,6 +89,7 @@ const QuizEditor = ({ quiz, onDone }: { quiz: Quiz | null; onDone: () => void })
       <div className="field">
         <label className="label">프롬프트</label>
         <textarea
+          id="quiz-prompt"
           className="textarea"
           value={draft.prompt}
           onChange={(event) => setDraft((prev) => ({ ...prev, prompt: event.target.value }))}
@@ -102,6 +104,7 @@ const QuizEditor = ({ quiz, onDone }: { quiz: Quiz | null; onDone: () => void })
           {draft.choices.map((choice, index) => (
             <input
               key={index}
+              id={`quiz-choice-${index}`}
               className="input"
               value={choice}
               onChange={(event) => setChoice(index, event.target.value)}
@@ -113,6 +116,7 @@ const QuizEditor = ({ quiz, onDone }: { quiz: Quiz | null; onDone: () => void })
       <div className="field">
         <label className="label">정답</label>
         <select
+          id="quiz-answer"
           className="select"
           value={draft.answer}
           onChange={(event) => setDraft((prev) => ({ ...prev, answer: event.target.value }))}

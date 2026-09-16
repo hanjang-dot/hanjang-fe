@@ -1,0 +1,31 @@
+url: ${BO_URL}
+env:
+  ADMIN_ID: "root"
+  ADMIN_PASSWORD: "hanjang-root-dev"
+---
+- launchApp:
+    clearState: true
+- runFlow: ../subflows/login.yaml
+- tapOn:
+    css: "nav a[href='/quizzes']"
+- assertVisible: "퀴즈 추가"
+- tapOn: "퀴즈 추가"
+- assertVisible: "유형"
+- evalScript: ${output.quizPrompt = "e2e-quiz-" + Date.now()}
+- tapOn:
+    css: "#quiz-prompt"
+- inputText: ${output.quizPrompt}
+- tapOn:
+    css: "#quiz-choice-0"
+- inputText: "O"
+- tapOn:
+    css: "#quiz-choice-1"
+- inputText: "X"
+- scrollUntilVisible:
+    element:
+      css: "#quiz-answer"
+- tapOn:
+    css: "#quiz-answer"
+- inputText: "O"
+- pressKey: enter
+- assertVisible: ${output.quizPrompt}

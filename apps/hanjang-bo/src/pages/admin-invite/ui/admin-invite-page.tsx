@@ -57,7 +57,7 @@ const AdminInvitePage = () => {
             {invites.map((invite) => (
               <tr key={invite.token}>
                 <td>
-                  <span className="mono-box">{invite.url}</span>
+                  <span id="invite-url" className="mono-box">{invite.url}</span>
                 </td>
                 <td>{new Date(invite.expiresAt).toLocaleString("ko-KR")}</td>
                 <td>
