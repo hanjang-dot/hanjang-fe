@@ -6,17 +6,20 @@ import { formatRemaining } from "@/shared/utils";
 
 interface ExamTimerProps {
   deadlineAt: number;
+  showBelowSec?: number;
 }
 
-const ExamTimer = ({ deadlineAt }: ExamTimerProps) => {
+const ExamTimer = ({ deadlineAt, showBelowSec }: ExamTimerProps) => {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, []);
-  return (
-    <Text style={styles.timer}>{formatRemaining(deadlineAt - now)}</Text>
-  );
+  const remainingMs = deadlineAt - now;
+  if (showBelowSec !== undefined && remainingMs > showBelowSec * 1000) {
+    return null;
+  }
+  return <Text style={styles.timer}>{formatRemaining(remainingMs)}</Text>;
 };
 
 const styles = StyleSheet.create((theme) => ({
