@@ -1,38 +1,38 @@
-import { Pressable, Text, View } from "react-native";
+import Constants from "expo-constants";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useAuth } from "@/features/auth";
-import { SectionHeader } from "@/shared/components";
+import { Button, ListRow } from "@/shared/components";
 
 const PROVIDER_LABELS: Record<string, string> = {
   kakao: "카카오",
-  phone: "전화",
+  phone: "전화번호",
 };
 
 const MyScreen = () => {
-  const { user, signIn, signOut } = useAuth();
+  const { user, signOut } = useAuth();
+  const version = Constants.expoConfig?.version ?? "1.0.0";
   return (
     <View style={styles.root}>
-      <SectionHeader title="마이" />
-      <View style={styles.card}>
-        {user ? (
-          <>
-            <Text style={styles.name}>{user.name}</Text>
-            <Text style={styles.caption}>
-              {PROVIDER_LABELS[user.provider]} 계정
-            </Text>
-            <Pressable style={styles.button} onPress={signOut}>
-              <Text style={styles.buttonText}>로그아웃</Text>
-            </Pressable>
-          </>
-        ) : (
-          <>
-            <Text style={styles.caption}>로그인이 필요합니다</Text>
-            <Pressable style={styles.button} onPress={signIn}>
-              <Text style={styles.buttonText}>로그인</Text>
-            </Pressable>
-          </>
-        )}
+      <View style={styles.rows}>
+        <ListRow
+          title="계정"
+          meta={
+            user ? `${PROVIDER_LABELS[user.provider]} 연결됨` : "미연결"
+          }
+        />
+        <ListRow title="앱 버전" meta={version} />
+      </View>
+      <View style={styles.actions}>
+        <Button
+          label="로그아웃"
+          variant="primary"
+          size="lg"
+          full
+          icon="logout"
+          onPress={signOut}
+        />
       </View>
     </View>
   );
@@ -41,35 +41,16 @@ const MyScreen = () => {
 const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
-    backgroundColor: theme.colors.paper,
+    backgroundColor: theme.colors.bg,
   },
-  card: {
-    margin: theme.spacing.lg,
-    padding: theme.spacing.lg,
-    backgroundColor: theme.colors.card,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: theme.colors.hairline,
-    gap: theme.spacing.sm,
+  rows: {
+    marginTop: theme.spacing.lg,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: theme.colors.border,
   },
-  name: {
-    ...theme.typography.heading,
-    color: theme.colors.ink,
-  },
-  caption: {
-    ...theme.typography.caption,
-    color: theme.colors.muted,
-  },
-  button: {
-    alignSelf: "flex-start",
-    backgroundColor: theme.colors.navy,
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-  },
-  buttonText: {
-    ...theme.typography.button,
-    color: theme.colors.choiceOnText,
+  actions: {
+    padding: theme.spacing.screenPadding,
   },
 }));
 

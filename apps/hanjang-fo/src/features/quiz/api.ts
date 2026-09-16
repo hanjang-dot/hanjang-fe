@@ -4,6 +4,7 @@ const MOCK_LATENCY_MS = 150;
 
 const MOCK_QUIZ_SET: QuizSet = {
   quizSetId: "quiz-set-today",
+  title: "오늘의 퀴즈",
   quizzes: [
     {
       quizId: "quiz-1",

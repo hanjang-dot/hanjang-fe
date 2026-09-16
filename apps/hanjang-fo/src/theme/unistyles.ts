@@ -1,75 +1,112 @@
 import { StyleSheet } from "react-native-unistyles";
 
-import { colors, radius, spacing } from "@hanjang/tokens";
+import {
+  colors,
+  fontFamilies,
+  fonts,
+  radius,
+  shadows,
+  sizes,
+  spacing,
+} from "@hanjang/tokens";
+
+import paneContract from "@/shared/pane-contract.json";
+
+import type { FontVariant } from "react-native";
+
+const tabularNums: FontVariant[] = ["tabular-nums"];
 
 export const typography = {
   display: {
-    fontFamily: "Noto Serif KR",
+    fontFamily: fontFamilies.serifBold,
     fontSize: 28,
     fontWeight: "700",
-    lineHeight: 35,
+    lineHeight: 36.4,
   },
-  heading: {
-    fontFamily: "IBM Plex Sans KR",
-    fontSize: 22,
-    fontWeight: "600",
-    lineHeight: 29,
+  h1: {
+    fontFamily: fontFamilies.serifBold,
+    fontSize: 24,
+    fontWeight: "700",
+    lineHeight: 31.2,
   },
-  title: {
-    fontFamily: "IBM Plex Sans KR",
-    fontSize: 18,
+  h2: {
+    fontFamily: fontFamilies.sansSemiBold,
+    fontSize: 20,
     fontWeight: "600",
-    lineHeight: 24,
+    lineHeight: 26,
+  },
+  h3: {
+    fontFamily: fontFamilies.sansSemiBold,
+    fontSize: 17,
+    fontWeight: "600",
+    lineHeight: 22.1,
   },
   body: {
-    fontFamily: "IBM Plex Sans KR",
-    fontSize: 16,
+    fontFamily: fontFamilies.sansRegular,
+    fontSize: 15,
     fontWeight: "400",
-    lineHeight: 25,
+    lineHeight: 22.5,
   },
-  bodyBold: {
-    fontFamily: "IBM Plex Sans KR",
-    fontSize: 16,
-    fontWeight: "600",
-    lineHeight: 25,
+  bodySm: {
+    fontFamily: fontFamilies.sansRegular,
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 21,
   },
   caption: {
-    fontFamily: "IBM Plex Sans KR",
-    fontSize: 13,
+    fontFamily: fontFamilies.sansRegular,
+    fontSize: 12,
     fontWeight: "400",
     lineHeight: 18,
   },
-  year: {
-    fontFamily: "IBM Plex Sans KR",
+  label: {
+    fontFamily: fontFamilies.sansMedium,
     fontSize: 13,
-    fontWeight: "600",
-    lineHeight: 17,
-    letterSpacing: 0.4,
-  },
-  timer: {
-    fontFamily: "IBM Plex Sans KR",
-    fontSize: 36,
-    fontWeight: "600",
-    lineHeight: 40,
-    letterSpacing: -0.5,
-  },
-  passage: {
-    fontFamily: "Noto Serif KR",
-    fontSize: 18,
-    fontWeight: "700",
-    lineHeight: 31,
+    fontWeight: "500",
+    lineHeight: 19.5,
   },
   button: {
-    fontFamily: "IBM Plex Sans KR",
+    fontFamily: fontFamilies.sansMedium,
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: "500",
     lineHeight: 18,
+  },
+  buttonLg: {
+    fontFamily: fontFamilies.sansMedium,
+    fontSize: 16,
+    fontWeight: "500",
+    lineHeight: 20,
+  },
+  buttonSm: {
+    fontFamily: fontFamilies.sansMedium,
+    fontSize: 14,
+    fontWeight: "500",
+    lineHeight: 17,
+  },
+  timer: {
+    fontFamily: fontFamilies.serifBold,
+    fontSize: 24,
+    fontWeight: "700",
+    lineHeight: 31.2,
+    fontVariant: tabularNums,
+  },
+  passage: {
+    fontFamily: fontFamilies.serifSemiBold,
+    fontSize: 17,
+    fontWeight: "600",
+    lineHeight: 27,
+  },
+  ox: {
+    fontFamily: fontFamilies.serifSemiBold,
+    fontSize: 28,
+    fontWeight: "600",
+    lineHeight: 36.4,
   },
 } as const;
 
 const breakpoints = {
   phone: 0,
-  tablet: 768,
+  tablet: paneContract.tabletBreakpoint,
   desktop: 1024,
 } as const;
 
@@ -77,6 +114,10 @@ const lightTheme = {
   colors,
   spacing,
   radius,
+  sizes,
+  shadows,
+  fonts,
+  fontFamilies,
   typography,
 } as const;
 

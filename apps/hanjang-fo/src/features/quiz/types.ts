@@ -13,5 +13,17 @@ export interface Quiz {
 
 export interface QuizSet {
   quizSetId: string;
+  title: string;
   quizzes: Quiz[];
+}
+
+export interface QuizAnswer {
+  quizId: string;
+  choiceIndex: number;
+  correct: boolean;
+}
+
+export interface QuizAttempt {
+  quizSetId: string;
+  answers: QuizAnswer[];
 }

@@ -4,6 +4,7 @@ export interface ExamPaper {
   title: string;
   subject: string;
   timeLimitSec: number;
+  questionCount: number;
   publishedAt: string;
 }
 

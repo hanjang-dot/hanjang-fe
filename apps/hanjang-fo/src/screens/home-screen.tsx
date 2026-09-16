@@ -2,61 +2,103 @@ import { useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { ExamRow, useExamPapers } from "@/features/exam";
-import { useBookmarkIds, useToggleBookmark } from "@/features/bookmark";
+import { useExam, useExamPapers } from "@/features/exam";
 import { QuizSetCard } from "@/features/quiz";
 import { useActiveSession } from "@/features/session";
-import { SectionHeader } from "@/shared/components";
-
-const RECENT_COUNT = 3;
+import {
+  Button,
+  ErrorState,
+  ProgressBar,
+  SkeletonCard,
+} from "@/shared/components";
+import { formatRemaining } from "@/shared/utils";
 
 const HomeScreen = () => {
   const router = useRouter();
-  const { data: papers = [] } = useExamPapers();
-  const bookmarkIds = useBookmarkIds();
-  const toggleBookmark = useToggleBookmark();
+  const { data: papers = [], isLoading, isError, refetch } = useExamPapers();
   const activeSession = useActiveSession();
-  const activePaper = papers.find(
-    (paper) => paper.examId === activeSession?.examId,
+  const { data: activeExam } = useExam(
+    activeSession?.examId ?? "",
+    activeSession !== null,
   );
-  const recent = papers.slice(0, RECENT_COUNT);
+  const answeredCount = activeSession
+    ? Object.keys(activeSession.answers).length
+    : 0;
+  const totalCount =
+    activeExam?.questions.length ??
+    activeExam?.paper.questionCount ??
+    0;
+  const latest = papers[0];
+
+  if (isLoading) {
+    return (
+      <View style={styles.loading}>
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
+      </View>
+    );
+  }
+  if (isError) {
+    return (
+      <ErrorState
+        desc="목록을 불러오지 못했습니다. 다시 시도해 주세요."
+        onRetry={() => refetch()}
+      />
+    );
+  }
+
   return (
-    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.root}
+      contentContainerStyle={styles.content}
+    >
       {activeSession ? (
-        <View>
-          <SectionHeader title="이어하기" />
-          <View style={styles.section}>
-            <Pressable
-              style={styles.resume}
-              onPress={() => router.push(`/exam/${activeSession.examId}`)}
-            >
-              <Text style={styles.resumeTitle}>
-                {activePaper?.title ?? activeSession.examId}
+        <View style={styles.card}>
+          <View style={styles.cardRow}>
+            <View style={styles.cardMeta}>
+              <Text style={styles.cardTitle}>이어하기</Text>
+              <Text style={styles.cardDesc} numberOfLines={1}>
+                {activeExam?.paper.title ?? activeSession.examId}
               </Text>
-              <Text style={styles.resumeCaption}>
-                풀던 시험지로 돌아간다
+              <Text style={styles.cardCaption}>
+                남은 시간{" "}
+                {formatRemaining(activeSession.deadlineAt - Date.now())}
               </Text>
-            </Pressable>
+            </View>
+            <Button
+              label="이어하기"
+              variant="primary"
+              size="md"
+              icon="play"
+              onPress={() =>
+                router.push(`/exam/${activeSession.examId}`)
+              }
+            />
           </View>
+          <ProgressBar
+            progress={totalCount > 0 ? answeredCount / totalCount : 0}
+          />
         </View>
       ) : null}
-      <SectionHeader title="오늘의 퀴즈" />
-      <View style={styles.section}>
-        <QuizSetCard />
-      </View>
-      <SectionHeader title="최근 회차" />
-      <View>
-        {recent.map((paper) => (
-          <ExamRow
-            key={paper.examId}
-            paper={paper}
-            bookmarked={bookmarkIds.includes(paper.examId)}
-            visible
-            onPress={() => router.push(`/exam/${paper.examId}`)}
-            onToggleBookmark={() => toggleBookmark(paper.examId)}
-          />
-        ))}
-      </View>
+      <QuizSetCard />
+      {latest ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push("/library")}
+          style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+        >
+          <View style={styles.cardMeta}>
+            <Text style={styles.cardTitle}>최근 발행</Text>
+            <Text style={styles.cardDesc} numberOfLines={1}>
+              {latest.title}
+            </Text>
+            <Text style={styles.cardCaption}>
+              {papers.length > 1 ? `외 ${papers.length - 1}회차` : "1회차"}
+            </Text>
+          </View>
+        </Pressable>
+      ) : null}
     </ScrollView>
   );
 };
@@ -64,29 +106,56 @@ const HomeScreen = () => {
 const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
-    backgroundColor: theme.colors.paper,
+    backgroundColor: theme.colors.bg,
   },
   content: {
-    paddingBottom: theme.spacing.xl,
+    paddingTop: theme.spacing.lg,
+    paddingBottom: theme.spacing.xxxl,
+    gap: theme.spacing.lg,
   },
-  section: {
-    paddingHorizontal: theme.spacing.lg,
+  loading: {
+    flex: 1,
+    backgroundColor: theme.colors.bg,
+    padding: theme.spacing.screenPadding,
+    gap: theme.spacing.lg,
   },
-  resume: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 18,
+  card: {
+    marginHorizontal: theme.spacing.screenPadding,
+    padding: theme.spacing.cardPadding,
+    backgroundColor: theme.colors.surface1,
     borderWidth: 1,
-    borderColor: theme.colors.hairline,
-    padding: theme.spacing.lg,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.lg,
+    gap: theme.spacing.md,
+    boxShadow: theme.shadows.sm,
+  },
+  pressed: {
+    backgroundColor: theme.colors.surface2,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  cardRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.md,
+  },
+  cardMeta: {
+    flex: 1,
     gap: theme.spacing.xs,
+    minWidth: 0,
   },
-  resumeTitle: {
-    ...theme.typography.title,
-    color: theme.colors.ink,
+  cardTitle: {
+    ...theme.typography.body,
+    fontFamily: theme.typography.h3.fontFamily,
+    color: theme.colors.text,
   },
-  resumeCaption: {
+  cardDesc: {
+    ...theme.typography.bodySm,
+    color: theme.colors.textMuted,
+  },
+  cardCaption: {
     ...theme.typography.caption,
-    color: theme.colors.muted,
+    color: theme.colors.textMuted,
   },
 }));
 

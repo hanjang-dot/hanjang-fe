@@ -1,18 +1,27 @@
-import { useRouter } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useIsOffline } from "@/shared/hooks";
+import { Stack, useRouter } from "expo-router";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import {
   ExamTimer,
   PassagePane,
   QuestionBlock,
-  paneContract,
   useExam,
 } from "@/features/exam";
 import {
   useExamSession,
   useSessionStore,
 } from "@/features/session";
+import {
+  Button,
+  BottomCta,
+  EmptyState,
+  ErrorState,
+  Icon,
+  OfflineBanner,
+  SkeletonCard,
+} from "@/shared/components";
 
 interface ExamScreenProps {
   examId: string;
@@ -20,50 +29,124 @@ interface ExamScreenProps {
 
 const ExamScreen = ({ examId }: ExamScreenProps) => {
   const router = useRouter();
-  const { data } = useExam(examId);
+  const { theme } = useUnistyles();
+  const { data, isLoading, isError, refetch } = useExam(examId);
   const session = useExamSession(examId, data?.paper.timeLimitSec);
   const submitSession = useSessionStore((state) => state.submitSession);
   const addStroke = useSessionStore((state) => state.addStroke);
-  const { rt } = useUnistyles();
-  const wide = rt.breakpoint !== "phone";
-  if (!data || !session) {
-    return <View style={styles.root} />;
-  }
+  const isOffline = useIsOffline();
+
+  const confirmExit = () =>
+    Alert.alert("시험을 나갈까요?", "답안은 이 기기에 저장됩니다.", [
+      { text: "계속 풀기", style: "cancel" },
+      {
+        text: "나가기",
+        style: "destructive",
+        onPress: () => router.back(),
+      },
+    ]);
+
   const submit = () => {
+    if (!session) return;
     submitSession(session.sessionId);
-    router.replace(`/result/${session.sessionId}`);
+    router.replace(`/exam-result/${session.sessionId}`);
   };
+
+  const headerLeft = () => (
+    <View style={styles.headerLeft}>
+      <Pressable
+        accessibilityLabel="뒤로"
+        accessibilityRole="button"
+        hitSlop={8}
+        onPress={() => router.back()}
+        style={styles.headerButton}
+      >
+        <Icon name="chevronLeft" color={theme.colors.text} />
+      </Pressable>
+      {data ? (
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {data.paper.subject}
+        </Text>
+      ) : null}
+    </View>
+  );
+  const headerRight = () => (
+    <Pressable
+      accessibilityLabel="나가기"
+      accessibilityRole="button"
+      hitSlop={8}
+      onPress={confirmExit}
+      style={styles.headerButton}
+    >
+      <Icon name="doorOpen" color={theme.colors.text} />
+    </Pressable>
+  );
+
   return (
     <View style={styles.root}>
-      <View style={styles.header}>
-        <View style={styles.headerMeta}>
-          <Text style={styles.title} numberOfLines={1}>
-            {data.paper.title}
-          </Text>
-          <Text style={styles.caption}>{data.paper.subject}</Text>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          headerBackVisible: false,
+          headerTitleAlign: "center",
+          headerStyle: { backgroundColor: theme.colors.bg },
+          headerShadowVisible: false,
+          headerLeft,
+          headerTitle: () =>
+            session ? <ExamTimer deadlineAt={session.deadlineAt} /> : null,
+          headerRight,
+          title: "",
+        }}
+      />
+      {isOffline ? <OfflineBanner /> : null}
+      {isLoading || !session ? (
+        <View style={styles.loading}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </View>
-        <ExamTimer deadlineAt={session.deadlineAt} />
-        <Pressable style={styles.submit} onPress={submit}>
-          <Text style={styles.submitText}>제출</Text>
-        </Pressable>
-      </View>
-      <View style={[styles.panes, !wide && styles.panesStack]}>
-        <PassagePane
-          questions={data.questions}
-          onStroke={(points) =>
-            addStroke(session.sessionId, { points })
-          }
+      ) : isError ? (
+        <ErrorState
+          desc="시험지를 불러오지 못했습니다. 다시 시도해 주세요."
+          onRetry={() => refetch()}
         />
-        <ScrollView style={[styles.questions, wide && styles.questionsWide]}>
-          {data.questions.map((question) => (
-            <QuestionBlock
-              key={question.questionId}
-              session={session}
-              question={question}
+      ) : !data || data.questions.length === 0 ? (
+        <EmptyState
+          desc="시험지를 찾지 못했습니다"
+          actionLabel="자료실로"
+          onAction={() => router.replace("/library")}
+        />
+      ) : (
+        <>
+          <View style={styles.panes}>
+            <PassagePane
+              questions={data.questions}
+              onStroke={(points) =>
+                addStroke(session.sessionId, { points })
+              }
             />
-          ))}
-        </ScrollView>
-      </View>
+            <ScrollView style={styles.questions}>
+              {data.questions.map((question) => (
+                <QuestionBlock
+                  key={question.questionId}
+                  session={session}
+                  question={question}
+                />
+              ))}
+            </ScrollView>
+          </View>
+          <BottomCta>
+            <Button
+              label="제출"
+              variant="primary"
+              size="lg"
+              full
+              onPress={submit}
+            />
+          </BottomCta>
+        </>
+      )}
     </View>
   );
 };
@@ -71,53 +154,37 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
 const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
-    backgroundColor: theme.colors.paper,
+    backgroundColor: theme.colors.bg,
   },
-  header: {
+  loading: {
+    padding: theme.spacing.screenPadding,
+    gap: theme.spacing.md,
+  },
+  headerLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.xl,
-    paddingBottom: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.hairline,
+    gap: theme.spacing.sm,
   },
-  headerMeta: {
-    flex: 1,
-    gap: theme.spacing.xs,
+  headerButton: {
+    minWidth: theme.sizes.tapMin,
+    minHeight: theme.sizes.tapMin,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  title: {
-    ...theme.typography.heading,
-    color: theme.colors.ink,
-  },
-  caption: {
-    ...theme.typography.caption,
-    color: theme.colors.muted,
-  },
-  submit: {
-    backgroundColor: theme.colors.navy,
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-  },
-  submitText: {
-    ...theme.typography.button,
-    color: theme.colors.choiceOnText,
+  headerTitle: {
+    ...theme.typography.h3,
+    color: theme.colors.text,
+    maxWidth: 140,
   },
   panes: {
     flex: 1,
-    flexDirection: "row",
-  },
-  panesStack: {
-    flexDirection: "column",
+    flexDirection: {
+      phone: "column",
+      tablet: "row",
+    },
   },
   questions: {
     flex: 1,
-  },
-  questionsWide: {
-    flexGrow: 0,
-    width: paneContract.questionPaneWidth,
   },
 }));
 

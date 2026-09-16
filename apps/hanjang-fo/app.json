@@ -7,7 +7,7 @@
     "orientation": "default",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "backgroundColor": "#F3EBDD",
+    "backgroundColor": "#F6F4FB",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.hanjang.fo"
@@ -15,7 +15,10 @@
     "android": {
       "package": "com.hanjang.fo"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
     "experiments": {
       "typedRoutes": true
     }

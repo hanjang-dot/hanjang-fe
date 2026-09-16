@@ -1,16 +1,21 @@
 import { LegendList } from "@legendapp/list/react-native";
+import { useIsOffline } from "@/shared/hooks";
 import { useRouter } from "expo-router";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import {
-  ExamRow,
+  ExamCard,
   canFetchNext,
   useExamPapersPaged,
 } from "@/features/exam";
 import { useBookmarkIds, useToggleBookmark } from "@/features/bookmark";
-import { SectionHeader } from "@/shared/components";
-import { useVisibleIds } from "@/shared/hooks";
+import {
+  EmptyState,
+  ErrorState,
+  OfflineBanner,
+  SkeletonCard,
+} from "@/shared/components";
 
 const LibraryScreen = () => {
   const router = useRouter();
@@ -19,35 +24,58 @@ const LibraryScreen = () => {
     freshCounts,
     hasNextPage,
     isFetchingNextPage,
+    isLoading,
+    isError,
+    refetch,
     fetchNextPage,
   } = useExamPapersPaged();
   const bookmarkIds = useBookmarkIds();
   const toggleBookmark = useToggleBookmark();
-  const { visibleIds, onViewableItemsChanged } = useVisibleIds();
+  const isOffline = useIsOffline();
+
   return (
     <View style={styles.root}>
-      <SectionHeader title="풀 시험지를 고르세요" />
-      <LegendList
-        data={papers}
-        keyExtractor={(paper) => paper.examId}
-        recycleItems
-        onViewableItemsChanged={onViewableItemsChanged}
-        onEndReached={() => {
-          if (isFetchingNextPage) return;
-          if (canFetchNext(Boolean(hasNextPage), freshCounts)) {
-            fetchNextPage();
-          }
-        }}
-        renderItem={({ item: paper }) => (
-          <ExamRow
-            paper={paper}
-            bookmarked={bookmarkIds.includes(paper.examId)}
-            visible={visibleIds.has(paper.examId)}
-            onPress={() => router.push(`/exam/${paper.examId}`)}
-            onToggleBookmark={() => toggleBookmark(paper.examId)}
-          />
-        )}
-      />
+      {isOffline ? <OfflineBanner /> : null}
+      {isLoading ? (
+        <View style={styles.loading}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </View>
+      ) : isError ? (
+        <ErrorState
+          desc="시험지 목록을 불러오지 못했습니다. 네트워크를 확인한 뒤 다시 시도해 주세요."
+          onRetry={() => refetch()}
+        />
+      ) : papers.length === 0 ? (
+        <EmptyState
+          desc="아직 발행된 시험지가 없습니다"
+          actionLabel="다시 불러오기"
+          onAction={() => refetch()}
+        />
+      ) : (
+        <LegendList
+          data={papers}
+          keyExtractor={(paper) => paper.examId}
+          recycleItems
+          contentContainerStyle={styles.listContent}
+          onEndReached={() => {
+            if (isFetchingNextPage) return;
+            if (canFetchNext(Boolean(hasNextPage), freshCounts)) {
+              fetchNextPage();
+            }
+          }}
+          renderItem={({ item: paper }) => (
+            <ExamCard
+              paper={paper}
+              bookmarked={bookmarkIds.includes(paper.examId)}
+              onPress={() => router.push(`/exam/${paper.examId}`)}
+              onToggleBookmark={() => toggleBookmark(paper.examId)}
+            />
+          )}
+        />
+      )}
     </View>
   );
 };
@@ -55,7 +83,15 @@ const LibraryScreen = () => {
 const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
-    backgroundColor: theme.colors.paper,
+    backgroundColor: theme.colors.bg,
+  },
+  loading: {
+    padding: theme.spacing.screenPadding,
+    gap: theme.spacing.md,
+  },
+  listContent: {
+    paddingTop: theme.spacing.lg,
+    paddingBottom: theme.spacing.xxxl,
   },
 }));
 

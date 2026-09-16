@@ -57,9 +57,11 @@ const styles = StyleSheet.create((theme) => ({
     position: "relative",
     width: "100%",
     height,
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.surface2,
+    borderRadius: theme.radius.md,
     borderWidth: 1,
-    borderColor: theme.colors.hairline,
+    borderColor: theme.colors.border,
+    overflow: "hidden",
   }),
   tile: (top: number, height: number) => ({
     position: "absolute",
@@ -67,9 +69,9 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     right: 0,
     height,
-    backgroundColor: theme.colors.overlay,
+    backgroundColor: theme.colors.surface2,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.rule,
+    borderBottomColor: theme.colors.border,
   }),
 }));
 
