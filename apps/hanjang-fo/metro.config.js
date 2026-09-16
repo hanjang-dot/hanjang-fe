@@ -11,5 +11,11 @@ config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(workspaceRoot, "node_modules"),
 ];
+config.resolver.unstable_conditionNames = [
+  "react-native",
+  "import",
+  "require",
+  "default",
+];
 
 module.exports = config;
