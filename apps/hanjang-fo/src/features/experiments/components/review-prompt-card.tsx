@@ -1,40 +1,41 @@
 import { useRouter } from "expo-router";
+import { useEffect, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { useTodayQuizSet } from "../hooks";
-import { useQuizRunStore } from "../store";
+import { trackExperimentEvent } from "../api";
+import { EXPERIMENTS } from "../constants";
+import { useExperiment, useWrongAnswerCount } from "../hooks";
 
-import {
-  EXPERIMENTS,
-  trackExperimentEvent,
-  useExperiment,
-} from "@/features/experiments";
-
-const QuizSetCard = () => {
+const ReviewPromptCard = () => {
   const router = useRouter();
-  const { data } = useTodayQuizSet();
-  const begin = useQuizRunStore((state) => state.begin);
-  const variant = useExperiment(EXPERIMENTS.homeStartCta);
-  const start = () => {
-    trackExperimentEvent(EXPERIMENTS.homeStartCta, "conversion", { variant });
-    begin(data?.quizzes.map((quiz) => quiz.quizId) ?? []);
-    router.push("/quiz");
-  };
+  const variant = useExperiment(EXPERIMENTS.reviewPrompt);
+  const wrongCount = useWrongAnswerCount();
+  const visible = variant === "B" && wrongCount > 0;
+  const exposedRef = useRef(false);
+  useEffect(() => {
+    if (visible && !exposedRef.current) {
+      exposedRef.current = true;
+      trackExperimentEvent(EXPERIMENTS.reviewPrompt, "exposure", {
+        wrongCount,
+      });
+    }
+  }, [visible, wrongCount]);
+  if (!visible) return null;
   return (
     <Pressable
-      accessible
-      accessibilityLabel="오늘의 퀴즈"
       accessibilityRole="button"
-      onPress={start}
+      onPress={() => {
+        trackExperimentEvent(EXPERIMENTS.reviewPrompt, "conversion", {
+          wrongCount,
+        });
+        router.push("/review");
+      }}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.meta}>
-        <Text style={styles.title}>오늘의 퀴즈</Text>
-        <Text style={styles.desc}>OX · 빈칸 · 영단어 · 한국사</Text>
-        <Text style={styles.caption}>
-          {data ? `${data.quizzes.length}문제 세트` : "불러오는 중"}
-        </Text>
+        <Text style={styles.title}>틀린 문제 {wrongCount}개 복습하세요</Text>
+        <Text style={styles.caption}>복습 탭으로 이동</Text>
       </View>
     </Pressable>
   );
@@ -56,16 +57,14 @@ const styles = StyleSheet.create((theme) => ({
     elevation: 0,
   },
   meta: {
+    flex: 1,
     gap: theme.spacing.xs,
+    minWidth: 0,
   },
   title: {
     ...theme.typography.body,
     fontFamily: theme.typography.h3.fontFamily,
     color: theme.colors.text,
-  },
-  desc: {
-    ...theme.typography.bodySm,
-    color: theme.colors.textMuted,
   },
   caption: {
     ...theme.typography.caption,
@@ -73,4 +72,4 @@ const styles = StyleSheet.create((theme) => ({
   },
 }));
 
-export default QuizSetCard;
+export default ReviewPromptCard;

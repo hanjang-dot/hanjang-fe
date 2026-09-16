@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTodayQuizSet } from "../hooks";
@@ -10,8 +10,9 @@ import {
   trackExperimentEvent,
   useExperiment,
 } from "@/features/experiments";
+import { Button } from "@/shared/components";
 
-const QuizSetCard = () => {
+const QuizStartBanner = () => {
   const router = useRouter();
   const { data } = useTodayQuizSet();
   const begin = useQuizRunStore((state) => state.begin);
@@ -22,13 +23,7 @@ const QuizSetCard = () => {
     router.push("/quiz");
   };
   return (
-    <Pressable
-      accessible
-      accessibilityLabel="오늘의 퀴즈"
-      accessibilityRole="button"
-      onPress={start}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-    >
+    <View style={styles.banner}>
       <View style={styles.meta}>
         <Text style={styles.title}>오늘의 퀴즈</Text>
         <Text style={styles.desc}>OX · 빈칸 · 영단어 · 한국사</Text>
@@ -36,31 +31,34 @@ const QuizSetCard = () => {
           {data ? `${data.quizzes.length}문제 세트` : "불러오는 중"}
         </Text>
       </View>
-    </Pressable>
+      <Button
+        label="시작하기"
+        variant="primary"
+        size="md"
+        icon="play"
+        onPress={start}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create((theme) => ({
-  card: {
+  banner: {
     marginHorizontal: theme.spacing.screenPadding,
     padding: theme.spacing.cardPadding,
-    backgroundColor: theme.colors.surface1,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.accentSoft,
     borderRadius: theme.radius.lg,
-    boxShadow: theme.shadows.sm,
-  },
-  pressed: {
-    backgroundColor: theme.colors.surface2,
-    shadowOpacity: 0,
-    elevation: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.md,
   },
   meta: {
+    flex: 1,
     gap: theme.spacing.xs,
+    minWidth: 0,
   },
   title: {
-    ...theme.typography.body,
-    fontFamily: theme.typography.h3.fontFamily,
+    ...theme.typography.h3,
     color: theme.colors.text,
   },
   desc: {
@@ -69,8 +67,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   caption: {
     ...theme.typography.caption,
-    color: theme.colors.textMuted,
+    color: theme.colors.accent,
   },
 }));
 
-export default QuizSetCard;
+export default QuizStartBanner;

@@ -21,7 +21,7 @@ const LoginPage = () => {
       return;
     }
     login.mutate(
-      { id: adminId.trim(), password },
+      { loginId: adminId.trim(), password },
       { onSuccess: () => navigate({ to: ROUTES.exams, replace: true }) },
     );
   };

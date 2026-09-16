@@ -1,0 +1,9 @@
+url: ${BO_URL}
+env:
+  ADMIN_ID: "root"
+  ADMIN_PASSWORD: "hanjang-root-dev"
+---
+- launchApp:
+    clearState: true
+- runFlow: ../subflows/login.yaml
+- assertVisible: "시험지"

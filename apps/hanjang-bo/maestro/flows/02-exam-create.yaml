@@ -1,0 +1,12 @@
+url: ${BO_URL}
+env:
+  ADMIN_ID: "root"
+  ADMIN_PASSWORD: "hanjang-root-dev"
+---
+- launchApp:
+    clearState: true
+- runFlow: ../subflows/login.yaml
+- runFlow: ../subflows/create-exam.yaml
+- tapOn:
+    css: "nav a[href='/exams']"
+- assertVisible: ${output.round}

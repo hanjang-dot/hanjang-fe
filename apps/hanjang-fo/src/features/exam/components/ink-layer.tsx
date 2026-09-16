@@ -4,6 +4,8 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
 import { StyleSheet } from "react-native-unistyles";
 
+import { instrument } from "@/shared/instrumentation";
+
 import type { StrokePoint } from "@/features/session";
 
 const ACTIVATE_X = 8;
@@ -16,6 +18,7 @@ interface InkLayerProps {
 const InkLayer = ({ onStroke }: InkLayerProps) => {
   const points = useRef<StrokePoint[]>([]);
   const begin = (x: number, y: number) => {
+    instrument.strokeStarts += 1;
     points.current = [{ x, y }];
   };
   const push = (x: number, y: number) => {
