@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 
 import { useCreateExamPaper } from "@/entities/exam";
 import { ROUTES } from "@/shared/config/constants";
@@ -9,7 +7,7 @@ import { ROUTES } from "@/shared/config/constants";
 import type { FormEvent } from "react";
 
 const ExamCreatePage = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const createPaper = useCreateExamPaper();
   const [round, setRound] = useState("");
   const [subject, setSubject] = useState("");
@@ -38,7 +36,7 @@ const ExamCreatePage = () => {
         timeLimitMinutes: Number(timeLimitMinutes),
       },
       {
-        onSuccess: (paper) => router.push(ROUTES.examDetail(paper.id)),
+        onSuccess: (paper) => navigate({ to: ROUTES.examDetail(paper.id) }),
       },
     );
   };
@@ -114,7 +112,7 @@ const ExamCreatePage = () => {
           <button
             type="button"
             className="button button-secondary"
-            onClick={() => router.push(ROUTES.exams)}
+            onClick={() => navigate({ to: ROUTES.exams })}
           >
             취소
           </button>

@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 
 import { ROUTES } from "@/shared/config/constants";
 
@@ -10,7 +8,7 @@ import { useAcceptAdminInvite } from "../api/accept-admin-invite";
 import type { FormEvent } from "react";
 
 const InviteAcceptPage = ({ token }: { token: string }) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const accept = useAcceptAdminInvite();
   const [adminId, setAdminId] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +27,7 @@ const InviteAcceptPage = ({ token }: { token: string }) => {
     setLocalError("");
     accept.mutate(
       { token, id: adminId.trim(), password },
-      { onSuccess: () => router.replace(ROUTES.login) },
+      { onSuccess: () => navigate({ to: ROUTES.login, replace: true }) },
     );
   };
 

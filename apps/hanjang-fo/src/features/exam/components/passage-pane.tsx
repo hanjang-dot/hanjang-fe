@@ -51,27 +51,34 @@ const styles = StyleSheet.create((theme) => ({
   pane: {
     flex: 1,
     position: "relative",
-    backgroundColor: theme.colors.card,
-    borderRightWidth: 1,
-    borderRightColor: theme.colors.hairline,
+    backgroundColor: theme.colors.surface2,
+    borderRightWidth: {
+      phone: 0,
+      tablet: 1,
+    },
+    borderBottomWidth: {
+      phone: 1,
+      tablet: 0,
+    },
+    borderColor: theme.colors.border,
   },
   scroll: {
     flex: 1,
   },
   content: {
-    padding: theme.spacing.lg,
+    padding: theme.spacing.cardPadding,
     gap: theme.spacing.xl,
   },
   passage: {
     gap: theme.spacing.sm,
   },
   number: {
-    ...theme.typography.year,
-    color: theme.colors.stamp,
+    ...theme.typography.label,
+    color: theme.colors.accent,
   },
   text: {
     ...theme.typography.passage,
-    color: theme.colors.ink,
+    color: theme.colors.text,
   },
 }));
 

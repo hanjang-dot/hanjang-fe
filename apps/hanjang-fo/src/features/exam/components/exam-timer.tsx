@@ -22,7 +22,7 @@ const ExamTimer = ({ deadlineAt }: ExamTimerProps) => {
 const styles = StyleSheet.create((theme) => ({
   timer: {
     ...theme.typography.timer,
-    color: theme.colors.stamp,
+    color: theme.colors.text,
   },
 }));
 

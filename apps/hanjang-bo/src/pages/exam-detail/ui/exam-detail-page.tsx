@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 import { useExamPapers, useQuestions, useSetExamPaperPublished } from "@/entities/exam";
 import { ROUTES } from "@/shared/config/constants";
@@ -25,7 +23,7 @@ const ExamDetailPage = ({ examId }: { examId: string }) => {
     return (
       <>
         <h1>시험지 없음</h1>
-        <Link href={ROUTES.exams}>목록으로</Link>
+        <Link to={ROUTES.exams}>목록으로</Link>
       </>
     );
   }

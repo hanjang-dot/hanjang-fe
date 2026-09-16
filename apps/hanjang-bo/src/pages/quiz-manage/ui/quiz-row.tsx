@@ -1,4 +1,3 @@
-"use client";
 
 import { useDeleteQuiz, useSetQuizPublished } from "../api/quiz";
 import { QUIZ_TYPE_LABELS } from "../model/quiz";

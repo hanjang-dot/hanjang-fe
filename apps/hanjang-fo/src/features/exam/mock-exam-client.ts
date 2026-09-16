@@ -14,6 +14,7 @@ const MOCK_EXAM_PAPERS: ExamPaper[] = [
     title: "2025학년도 수능 국어",
     subject: "국어",
     timeLimitSec: 80 * 60,
+    questionCount: 45,
     publishedAt: "2026-09-01T00:00:00Z",
   },
   {
@@ -22,6 +23,7 @@ const MOCK_EXAM_PAPERS: ExamPaper[] = [
     title: "2025학년도 9월 모의평가 영어",
     subject: "영어",
     timeLimitSec: 70 * 60,
+    questionCount: 45,
     publishedAt: "2026-09-05T00:00:00Z",
   },
   {
@@ -30,6 +32,7 @@ const MOCK_EXAM_PAPERS: ExamPaper[] = [
     title: "2024학년도 수능 수학",
     subject: "수학",
     timeLimitSec: 100 * 60,
+    questionCount: 30,
     publishedAt: "2026-08-20T00:00:00Z",
   },
   {
@@ -38,6 +41,7 @@ const MOCK_EXAM_PAPERS: ExamPaper[] = [
     title: "2025학년도 6월 모의평가 국어",
     subject: "국어",
     timeLimitSec: 80 * 60,
+    questionCount: 45,
     publishedAt: "2026-08-10T00:00:00Z",
   },
   {
@@ -46,6 +50,7 @@ const MOCK_EXAM_PAPERS: ExamPaper[] = [
     title: "2024학년도 9월 모의평가 영어",
     subject: "영어",
     timeLimitSec: 70 * 60,
+    questionCount: 45,
     publishedAt: "2026-07-15T00:00:00Z",
   },
   {
@@ -54,6 +59,7 @@ const MOCK_EXAM_PAPERS: ExamPaper[] = [
     title: "2023학년도 수능 국어",
     subject: "국어",
     timeLimitSec: 80 * 60,
+    questionCount: 45,
     publishedAt: "2026-07-01T00:00:00Z",
   },
 ];

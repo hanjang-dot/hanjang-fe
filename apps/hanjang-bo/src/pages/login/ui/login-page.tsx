@@ -1,7 +1,5 @@
-"use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 
 import { ROUTES } from "@/shared/config/constants";
 
@@ -10,7 +8,7 @@ import { useAdminLogin } from "../api/admin-auth";
 import type { FormEvent } from "react";
 
 const LoginPage = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const login = useAdminLogin();
   const [adminId, setAdminId] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +22,7 @@ const LoginPage = () => {
     }
     login.mutate(
       { id: adminId.trim(), password },
-      { onSuccess: () => router.replace(ROUTES.exams) },
+      { onSuccess: () => navigate({ to: ROUTES.exams, replace: true }) },
     );
   };
 

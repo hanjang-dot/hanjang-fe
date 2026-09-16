@@ -1,5 +1,3 @@
-export { default as paneContract } from "./pane-contract.json";
-
 export * from "./api";
 export * from "./components";
 export * from "./constants";

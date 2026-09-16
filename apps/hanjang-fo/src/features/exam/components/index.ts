@@ -1,5 +1,4 @@
-export { default as CoverView } from "./cover-view";
-export { default as ExamRow } from "./exam-row";
+export { default as ExamCard } from "./exam-card";
 export { default as ExamTimer } from "./exam-timer";
 export { default as InkLayer } from "./ink-layer";
 export { default as PassagePane } from "./passage-pane";

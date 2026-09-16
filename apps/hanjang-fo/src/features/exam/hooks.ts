@@ -26,8 +26,9 @@ export const useExamPapersPaged = () => {
   return { ...query, papers: items, freshCounts };
 };
 
-export const useExam = (examId: string) =>
+export const useExam = (examId: string, enabled = true) =>
   useQuery({
     queryKey: examQueryKey(examId),
     queryFn: () => fetchExam(examId),
+    enabled: enabled && examId.length > 0,
   });
