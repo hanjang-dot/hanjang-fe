@@ -3,7 +3,11 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useExam, useExamPapers } from "@/features/exam";
-import { EXPERIMENTS, useExperiment } from "@/features/experiments";
+import {
+  EXPERIMENTS,
+  ReviewPromptCard,
+  useExperiment,
+} from "@/features/experiments";
 import { QuizSetCard, QuizStartBanner } from "@/features/quiz";
 import { useActiveSession } from "@/features/session";
 import {
@@ -84,6 +88,7 @@ const HomeScreen = () => {
           />
         </View>
       ) : null}
+      <ReviewPromptCard />
       {homeStartCtaVariant === "A" ? <QuizSetCard /> : null}
       {latest ? (
         <Pressable
