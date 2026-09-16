@@ -4,8 +4,10 @@ import { api, request } from "@/shared/api/client";
 
 export const useAcceptAdminInvite = () =>
   useMutation({
-    mutationFn: ({ token, ...json }: { token: string; id: string; password: string }) =>
+    mutationFn: (variables: { token: string; loginId: string; password: string }) =>
       request((signal) =>
-        api.post(`admin/invites/${token}/accept`, { json, signal }).json<{ id: string }>(),
+        api
+          .post("admin/invites/accept", { json: variables, signal })
+          .json<{ accessToken: string }>(),
       ),
   });

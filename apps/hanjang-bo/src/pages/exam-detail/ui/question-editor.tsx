@@ -113,6 +113,7 @@ const QuestionEditor = ({
       <div className="field">
         <label className="label">문항 번호</label>
         <input
+          id="question-number"
           className="input"
           type="number"
           value={draft.number}
@@ -123,6 +124,7 @@ const QuestionEditor = ({
       <div className="field">
         <label className="label">지문 이미지 URL</label>
         <input
+          id="question-passage-url"
           className="input"
           value={draft.passageImageUrl}
           onChange={(event) =>
@@ -166,6 +168,7 @@ const QuestionEditor = ({
       <div className="field">
         <label className="label">프롬프트</label>
         <textarea
+          id="question-prompt"
           className="textarea"
           value={draft.prompt}
           onChange={(event) => setDraft((prev) => ({ ...prev, prompt: event.target.value }))}
@@ -180,6 +183,7 @@ const QuestionEditor = ({
           {draft.choices.map((choice, index) => (
             <div className="row" key={index}>
               <input
+                id={`question-choice-${index}`}
                 className="input"
                 value={choice}
                 onChange={(event) => setChoice(index, event.target.value)}
@@ -206,6 +210,7 @@ const QuestionEditor = ({
       <div className="field">
         <label className="label">정답</label>
         <select
+          id="question-answer"
           className="select"
           value={draft.answer}
           onChange={(event) => setDraft((prev) => ({ ...prev, answer: event.target.value }))}
