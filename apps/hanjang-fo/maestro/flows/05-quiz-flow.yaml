@@ -1,0 +1,31 @@
+appId: com.hanjang.fo
+---
+- runFlow: ../_setup.yaml
+- runFlow: ../_signin.yaml
+- tapOn: "오늘의 퀴즈"
+- extendedWaitUntil:
+    visible: "다음 중 알맞은 뜻을 고르세요"
+    timeout: 15000
+- repeat:
+    times: 12
+    commands:
+      - runFlow:
+          when:
+            visible: "다음 문제"
+          commands:
+            - tapOn:
+                point: "30%,30%"
+            - tapOn: "다음 문제"
+      - runFlow:
+          when:
+            visible: "결과 보기"
+          commands:
+            - tapOn:
+                point: "30%,30%"
+            - tapOn: "결과 보기"
+- extendedWaitUntil:
+    visible: "퀴즈 결과"
+    timeout: 10000
+- takeScreenshot: 05-quiz-result
+- tapOn: "홈으로"
+- assertVisible: "오늘의 퀴즈"

@@ -1,0 +1,15 @@
+appId: com.hanjang.fo
+---
+- repeat:
+    times: 3
+    commands:
+      - runFlow:
+          when:
+            notVisible: "오늘의 퀴즈"
+          commands:
+            - openLink: "hanjang://auth/kakao?access=${E2E_ACCESS_TOKEN}&refresh=${E2E_REFRESH_TOKEN}"
+            - extendedWaitUntil:
+                visible: "오늘의 퀴즈"
+                timeout: 8000
+                optional: true
+- assertVisible: "오늘의 퀴즈"

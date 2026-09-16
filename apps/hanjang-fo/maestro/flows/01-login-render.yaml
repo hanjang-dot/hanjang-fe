@@ -1,0 +1,4 @@
+appId: com.hanjang.fo
+---
+- runFlow: ../_setup.yaml
+- takeScreenshot: 01-login
