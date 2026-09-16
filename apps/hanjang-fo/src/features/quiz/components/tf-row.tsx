@@ -30,6 +30,7 @@ const TfRow = ({ selectedIndex, correct, onSelect }: TfRowProps) => (
         <Pressable
           key={mark}
           accessibilityRole="button"
+          accessibilityLabel={mark}
           disabled={selectedIndex !== null}
           onPress={() => onSelect(index)}
           style={({ pressed }) => [
