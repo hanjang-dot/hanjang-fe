@@ -8,7 +8,11 @@
     "ios": "expo run:ios",
     "android": "expo run:android",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test scripts/*.test.ts"
+    "test": "node --experimental-strip-types --test scripts/*.test.ts",
+    "measure:pane-contract": "node --experimental-strip-types --test scripts/measure-pane-contract.test.ts",
+    "measure:grade-run": "node --experimental-strip-types --test scripts/measure-grade-run.test.ts",
+    "measure:session-restore": "node --experimental-strip-types --test scripts/measure-session-restore.test.ts",
+    "measure:sheet-list": "node --experimental-strip-types --test scripts/measure-sheet-list.test.ts"
   },
   "dependencies": {
     "@expo-google-fonts/ibm-plex-sans-kr": "^0.4.1",
