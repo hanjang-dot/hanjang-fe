@@ -8,9 +8,9 @@ import { useQuizRunStore } from "../store";
 const QuizSetCard = () => {
   const router = useRouter();
   const { data } = useTodayQuizSet();
-  const reset = useQuizRunStore((state) => state.reset);
+  const begin = useQuizRunStore((state) => state.begin);
   const start = () => {
-    reset();
+    begin(data?.quizzes.map((quiz) => quiz.quizId) ?? []);
     router.push("/quiz");
   };
   return (

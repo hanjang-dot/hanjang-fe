@@ -1,19 +1,24 @@
 import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { Polyline, Svg } from "react-native-svg";
 
 import InkLayer from "./ink-layer";
 import TiledPassageImage from "./tiled-passage-image";
 
-import type { StrokePoint } from "@/features/session";
+import type { Stroke, StrokePoint } from "@/features/session";
 import type { Question } from "../types";
+
+const toPolylinePoints = (points: StrokePoint[]) =>
+  points.map((point) => `${point.x},${point.y}`).join(" ");
 
 interface PassagePaneProps {
   questions: Question[];
+  strokes: Stroke[];
   onStroke: (points: StrokePoint[]) => void;
 }
 
-const PassagePane = ({ questions, onStroke }: PassagePaneProps) => {
+const PassagePane = ({ questions, strokes, onStroke }: PassagePaneProps) => {
   const [scrollY, setScrollY] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   return (
@@ -30,7 +35,9 @@ const PassagePane = ({ questions, onStroke }: PassagePaneProps) => {
         {questions.map((question) => (
           <View key={question.questionId} style={styles.passage}>
             <Text style={styles.number}>{question.number}번</Text>
-            {question.passageImageHeight ? (
+            {question.passageImageUrl ? (
+              <TiledPassageImage imageUrl={question.passageImageUrl} />
+            ) : question.passageImageHeight ? (
               <TiledPassageImage
                 imageHeight={question.passageImageHeight}
                 scrollY={scrollY}
@@ -42,6 +49,19 @@ const PassagePane = ({ questions, onStroke }: PassagePaneProps) => {
           </View>
         ))}
       </ScrollView>
+      <Svg style={styles.ink} pointerEvents="none">
+        {strokes.map((stroke, index) => (
+          <Polyline
+            key={index}
+            points={toPolylinePoints(stroke.points)}
+            fill="none"
+            stroke={styles.inkStroke.color}
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ))}
+      </Svg>
       <InkLayer onStroke={onStroke} />
     </View>
   );
@@ -79,6 +99,16 @@ const styles = StyleSheet.create((theme) => ({
   text: {
     ...theme.typography.passage,
     color: theme.colors.text,
+  },
+  ink: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  inkStroke: {
+    color: theme.colors.accent,
   },
 }));
 

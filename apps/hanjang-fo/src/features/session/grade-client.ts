@@ -1,32 +1,19 @@
 import { Effect } from "effect";
-import ky from "ky";
 
-import { toError, withTimeout } from "@/shared/utils";
+import { hanjangApi } from "@/shared/api-client";
 
 import type { GradeClient } from "./types";
 
-export const createKyGradeClient = (prefixUrl: string): GradeClient => {
-  const http = ky.create({ prefix: prefixUrl });
-  return {
-    grade: ({ runId, questionId, choiceId }) =>
-      withTimeout(
-        Effect.tryPromise({
-          try: (signal) =>
-            http
-              .post("grade", {
-                json: { questionId, choiceId, runId },
-                signal,
-              })
-              .json<{ correct: boolean }>(),
-          catch: toError,
-        }).pipe(
-          Effect.map((body) => ({
-            runId,
-            questionId,
-            choiceId,
-            correct: body.correct,
-          })),
-        ),
+export const createRemoteGradeClient = (): GradeClient => ({
+  grade: ({ runId, examSessionId, questionId, choiceId }) =>
+    hanjangApi!.grade
+      .answer({ examSessionId, questionId, choice: choiceId })
+      .pipe(
+        Effect.map((body) => ({
+          runId: body.runId || runId,
+          questionId,
+          choiceId,
+          correct: body.correct,
+        })),
       ),
-  };
-};
+});

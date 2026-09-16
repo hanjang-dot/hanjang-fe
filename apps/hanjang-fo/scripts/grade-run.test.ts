@@ -7,6 +7,7 @@ import { createMockGradeClient } from "../src/features/session/mock-grade-client
 
 const request = (runId: string, choiceId = "c1") => ({
   runId,
+  examSessionId: "s1",
   questionId: "q1",
   choiceId,
   correctChoiceId: "c2",

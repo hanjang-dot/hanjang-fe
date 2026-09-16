@@ -2,6 +2,7 @@ import type { ExamSession, SessionStatus } from "./types";
 
 export interface SessionRow {
   session_id: string;
+  remote_id: string | null;
   exam_id: string;
   deadline_at: number;
   answers: string;
@@ -12,6 +13,7 @@ export interface SessionRow {
 
 export const sessionToRow = (session: ExamSession): SessionRow => ({
   session_id: session.sessionId,
+  remote_id: session.remoteId ?? null,
   exam_id: session.examId,
   deadline_at: session.deadlineAt,
   answers: JSON.stringify(session.answers),
@@ -22,6 +24,7 @@ export const sessionToRow = (session: ExamSession): SessionRow => ({
 
 export const rowToSession = (row: SessionRow): ExamSession => ({
   sessionId: row.session_id,
+  ...(row.remote_id ? { remoteId: row.remote_id } : {}),
   examId: row.exam_id,
   deadlineAt: row.deadline_at,
   answers: JSON.parse(row.answers),
