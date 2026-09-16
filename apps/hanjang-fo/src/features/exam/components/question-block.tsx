@@ -40,7 +40,9 @@ const QuestionBlock = ({ session, question }: QuestionBlockProps) => {
             session.answers[question.questionId] === choice.choiceId;
           const revealed = grade !== null;
           const isAnswer =
-            revealed && choice.choiceId === question.correctChoiceId;
+            revealed &&
+            (choice.choiceId === question.correctChoiceId ||
+              (picked && grade?.correct === true));
           return (
             <ChoiceButton
               key={choice.choiceId}
