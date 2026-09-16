@@ -1,4 +1,3 @@
-"use client";
 
 import { useDeleteQuestion } from "@/entities/exam";
 

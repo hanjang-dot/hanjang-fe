@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 import { useSetExamPaperPublished } from "@/entities/exam";
 import { ROUTES } from "@/shared/config/constants";
@@ -13,7 +11,7 @@ const ExamRow = ({ paper }: { paper: ExamPaper }) => {
   return (
     <tr>
       <td>
-        <Link href={ROUTES.examDetail(paper.id)}>{paper.round}</Link>
+        <Link to={ROUTES.examDetail(paper.id)}>{paper.round}</Link>
       </td>
       <td>{paper.subject}</td>
       <td>

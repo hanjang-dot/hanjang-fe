@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 import { useExamPapers } from "@/entities/exam";
 import { ROUTES } from "@/shared/config/constants";
@@ -14,7 +12,7 @@ const ExamListPage = () => {
     <>
       <div className="row-between">
         <h1>시험지</h1>
-        <Link href={ROUTES.examNew} className="button">
+        <Link to={ROUTES.examNew} className="button">
           새 시험지
         </Link>
       </div>
