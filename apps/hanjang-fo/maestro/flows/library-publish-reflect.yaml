@@ -1,0 +1,8 @@
+appId: com.hanjang.fo
+---
+- launchApp
+- extendedWaitUntil:
+    visible: ".*자료실.*"
+    timeout: 30000
+- tapOn: ".*자료실.*"
+- assertVisible: ".*${ROUND} 국어.*"
