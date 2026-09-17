@@ -1,0 +1,39 @@
+appId: com.hanjang.fo
+---
+- launchApp:
+    clearState: true
+- openLink: "hanjang://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 60000
+- tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Fast refresh"
+    commands:
+      - tapOn: "Close"
+- extendedWaitUntil:
+    visible: "카카오로 시작"
+    timeout: 30000
+- openLink: "hanjang://auth/kakao?access=${MAESTRO_ACCESS_TOKEN}&refresh=${MAESTRO_REFRESH_TOKEN}"
+- extendedWaitUntil:
+    visible: "오늘의 퀴즈"
+    timeout: 30000
+- tapOn: { point: "120,815" }
+- assertVisible: "E2E 모의고사"
+- tapOn: "E2E 모의고사"
+- assertVisible: "제출"
+- tapOn: "E2E 선택지 1-A"
+- swipe:
+    start: "50%, 78%"
+    end: "50%, 55%"
+- swipe:
+    start: "50%, 78%"
+    end: "50%, 55%"
+- tapOn: "E2E 선택지 2-A"
+- takeScreenshot: 04-exam-answered
+- tapOn: "제출"
+- extendedWaitUntil:
+    visible: "정답 2/2"
+    timeout: 10000
+- takeScreenshot: 04-exam-result

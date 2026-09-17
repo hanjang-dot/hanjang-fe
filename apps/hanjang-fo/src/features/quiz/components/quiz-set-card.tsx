@@ -23,6 +23,8 @@ const QuizSetCard = () => {
   };
   return (
     <Pressable
+      accessible
+      accessibilityLabel="오늘의 퀴즈"
       accessibilityRole="button"
       onPress={start}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}

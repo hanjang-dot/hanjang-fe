@@ -28,6 +28,7 @@ const ChoiceButton = ({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={text}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
