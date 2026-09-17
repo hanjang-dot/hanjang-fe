@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Cause, Effect, Exit } from "effect";
 import { useShallow } from "zustand/shallow";
 
+import { instrument } from "@/shared/instrumentation";
+
 import { gradeClient as defaultGradeClient, sessionClient } from "./api";
 import { initSessionTable, loadSessions } from "./db";
 import { createGradeGate } from "./grade-run";
@@ -147,8 +149,15 @@ export const useGradeChoice = (
 
   const choose = useCallback(
     async (choiceId: string) => {
-      if (!hydrated) return;
-      if (variant === "grading") return;
+      instrument.choiceTaps += 1;
+      if (!hydrated) {
+        instrument.choiceBlocked += 1;
+        return;
+      }
+      if (variant === "grading") {
+        instrument.choiceBlocked += 1;
+        return;
+      }
       setVariant("grading");
       const remoteId =
         session.remoteId ??
@@ -170,10 +179,17 @@ export const useGradeChoice = (
         }),
       );
       run.fiber.addObserver((exit) => {
-        if (!gate.isCurrent(run)) return;
+        if (!gate.isCurrent(run)) {
+          instrument.droppedResults += 1;
+          return;
+        }
         if (Exit.isSuccess(exit)) {
           const result = exit.value;
-          if (result.runId !== run.runId) return;
+          if (result.runId !== run.runId) {
+            instrument.droppedResults += 1;
+            return;
+          }
+          instrument.appliedResults += 1;
           setGrade(session.sessionId, result);
           setVariant("graded");
           return;
