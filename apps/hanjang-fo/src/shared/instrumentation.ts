@@ -1,4 +1,5 @@
 export const instrument = {
+  gradeDelayMs: 0,
   coverDecodes: 0,
   tileDecodes: 0,
   choiceTaps: 0,
@@ -6,6 +7,8 @@ export const instrument = {
   strokeStarts: 0,
   appliedResults: 0,
   droppedResults: 0,
+  passageScrollY: 0,
+  questionPaneWidth: 0,
   reset: () => {
     instrument.coverDecodes = 0;
     instrument.tileDecodes = 0;
@@ -14,5 +17,6 @@ export const instrument = {
     instrument.strokeStarts = 0;
     instrument.appliedResults = 0;
     instrument.droppedResults = 0;
+    instrument.passageScrollY = 0;
   },
 };

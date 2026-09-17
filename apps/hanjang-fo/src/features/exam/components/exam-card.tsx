@@ -1,7 +1,8 @@
-import { View } from "react-native";
+import { Image, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { Button, Card, IconButton } from "@/shared/components";
+import { instrument } from "@/shared/instrumentation";
 
 import type { ExamPaper } from "../types";
 
@@ -42,10 +43,27 @@ const ExamCard = ({
         ) : null}
       </View>
     }
-  />
+  >
+    {paper.coverImageUrl ? (
+      <Image
+        testID="exam-card-cover"
+        source={{ uri: paper.coverImageUrl }}
+        style={styles.cover}
+        onLoad={() => {
+          instrument.coverDecodes += 1;
+        }}
+      />
+    ) : null}
+  </Card>
 );
 
 const styles = StyleSheet.create((theme) => ({
+  cover: {
+    width: "100%",
+    height: 56,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.surface2,
+  },
   actions: {
     flexDirection: "row",
     alignItems: "center",

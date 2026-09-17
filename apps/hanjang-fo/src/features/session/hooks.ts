@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Cause, Effect, Exit } from "effect";
 import { useShallow } from "zustand/shallow";
@@ -5,6 +6,7 @@ import { useShallow } from "zustand/shallow";
 import { instrument } from "@/shared/instrumentation";
 
 import { gradeClient as defaultGradeClient, sessionClient } from "./api";
+import { RESTORE_DELAY_STORAGE_KEY } from "./constants";
 import { initSessionTable, loadSessions } from "./db";
 import { createGradeGate } from "./grade-run";
 import { remoteDetailToLocal, useSessionStore } from "./store";
@@ -64,14 +66,25 @@ const syncRemoteSessions = async () => {
 export const useHydrateSessions = () => {
   const hydrate = useSessionStore((state) => state.hydrate);
   useEffect(() => {
-    try {
-      initSessionTable();
-      hydrate(loadSessions());
-    } catch (error) {
-      console.warn("session restore failed", error);
-      hydrate([]);
-    }
-    void syncRemoteSessions();
+    void (async () => {
+      try {
+        const restoreDelay = await AsyncStorage.getItem(
+          RESTORE_DELAY_STORAGE_KEY,
+        );
+        if (restoreDelay) {
+          await AsyncStorage.removeItem(RESTORE_DELAY_STORAGE_KEY);
+          await new Promise((resolve) =>
+            setTimeout(resolve, parseInt(restoreDelay, 10)),
+          );
+        }
+        initSessionTable();
+        hydrate(loadSessions());
+      } catch (error) {
+        console.warn("session restore failed", error);
+        hydrate([]);
+      }
+      void syncRemoteSessions();
+    })();
   }, [hydrate]);
 };
 

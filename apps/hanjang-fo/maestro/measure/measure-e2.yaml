@@ -1,0 +1,71 @@
+appId: com.hanjang.fo
+---
+- launchApp:
+    clearState: true
+- openLink: "hanjang://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 60000
+- tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Fast refresh"
+    commands:
+      - tapOn: "Close"
+- extendedWaitUntil:
+    visible: "카카오로 시작"
+    timeout: 60000
+- openLink: "hanjang://auth/kakao?access=${MAESTRO_ACCESS_TOKEN}&refresh=${MAESTRO_REFRESH_TOKEN}"
+- extendedWaitUntil:
+    visible: "오늘의 퀴즈"
+    timeout: 30000
+- openLink: "hanjang://exam/bb0bc797-422c-403c-a324-61e543e6ad59"
+- extendedWaitUntil:
+    visible: "E2E 선택지 1-A"
+    timeout: 30000
+- openLink: "hanjang://debug"
+- extendedWaitUntil:
+    visible:
+      id: "instrument-reset"
+    timeout: 10000
+- tapOn:
+    id: "instrument-reset"
+- tapOn:
+    id: "instrument-delay-2500"
+- tapOn:
+    id: "debug-close"
+- extendedWaitUntil:
+    visible: "E2E 선택지 1-A"
+    timeout: 10000
+- tapOn: "E2E 선택지 1-A"
+- tapOn: "E2E 선택지 1-B"
+- extendedWaitUntil:
+    visible:
+      id: "sheet-variant-graded"
+    timeout: 15000
+- tapOn: "E2E 선택지 1-C"
+- tapOn: "E2E 선택지 1-D"
+- extendedWaitUntil:
+    visible:
+      id: "sheet-variant-graded"
+    timeout: 15000
+- openLink: "hanjang://debug"
+- copyTextFrom:
+    id: "instrument-choice-taps"
+- assertTrue: ${parseInt(maestro.copiedText) === 4}
+- copyTextFrom:
+    id: "instrument-choice-blocked"
+- assertTrue: ${parseInt(maestro.copiedText) >= 2}
+- evalScript: ${output.blocked = maestro.copiedText}
+- copyTextFrom:
+    id: "instrument-applied-results"
+- assertTrue: ${parseInt(maestro.copiedText) === 2}
+- copyTextFrom:
+    id: "instrument-dropped-results"
+- assertTrue: ${parseInt(maestro.copiedText) === 0}
+- copyTextFrom:
+    id: "instrument-sessions"
+- evalScript: ${output.sessionsJson = maestro.copiedText}
+- tapOn:
+    id: "instrument-delay-0"
+- takeScreenshot: measure-e2-debug

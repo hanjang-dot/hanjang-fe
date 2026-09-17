@@ -30,7 +30,7 @@ const QuestionBlock = ({ session, question }: QuestionBlockProps) => {
   return (
     <View
       style={styles.block}
-      testID={`sheet-variant-${grade ? "graded" : variant}`}
+      testID={`sheet-variant-${variant}`}
     >
       <Text style={styles.prompt}>{question.prompt}</Text>
       <View style={styles.choices}>

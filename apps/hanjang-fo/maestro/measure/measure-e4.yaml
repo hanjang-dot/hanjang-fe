@@ -1,0 +1,67 @@
+appId: com.hanjang.fo
+---
+- launchApp:
+    clearState: true
+- openLink: "hanjang://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 60000
+- tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Fast refresh"
+    commands:
+      - tapOn: "Close"
+- extendedWaitUntil:
+    visible: "카카오로 시작"
+    timeout: 60000
+- openLink: "hanjang://auth/kakao?access=${MAESTRO_ACCESS_TOKEN}&refresh=${MAESTRO_REFRESH_TOKEN}"
+- extendedWaitUntil:
+    visible: "오늘의 퀴즈"
+    timeout: 30000
+- openLink: "hanjang://debug"
+- extendedWaitUntil:
+    visible:
+      id: "instrument-reset"
+    timeout: 10000
+- tapOn:
+    id: "instrument-reset"
+- tapOn:
+    id: "debug-close"
+- extendedWaitUntil:
+    visible: "오늘의 퀴즈"
+    timeout: 15000
+- tapOn: { point: "120,815" }
+- extendedWaitUntil:
+    visible:
+      id: "exam-card-cover"
+    timeout: 30000
+- openLink: "hanjang://debug"
+- copyTextFrom:
+    id: "instrument-cover-decodes"
+- assertTrue: ${parseInt(maestro.copiedText) > 0}
+- assertTrue: ${parseInt(maestro.copiedText) <= 25}
+- evalScript: ${output.initialCovers = maestro.copiedText}
+- tapOn:
+    id: "debug-close"
+- assertVisible: "E2E 회차 200"
+- scrollUntilVisible:
+    element:
+      text: "E2E 회차 001"
+    direction: DOWN
+    timeout: 240000
+    speed: 90
+- assertVisible: "E2E 회차 001"
+- scrollUntilVisible:
+    element:
+      text: "E2E 회차 200"
+    direction: UP
+    timeout: 240000
+    speed: 90
+- assertVisible: "E2E 회차 200"
+- openLink: "hanjang://debug"
+- copyTextFrom:
+    id: "instrument-cover-decodes"
+- evalScript: ${output.totalCovers = maestro.copiedText}
+- assertTrue: ${parseInt(maestro.copiedText) <= 1000}
+- takeScreenshot: measure-e4-debug
