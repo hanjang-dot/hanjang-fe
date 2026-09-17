@@ -10,7 +10,7 @@ export const createRemoteGradeClient = (): GradeClient => ({
       .answer({ examSessionId, questionId, choice: choiceId })
       .pipe(
         Effect.map((body) => ({
-          runId: body.runId || runId,
+          runId,
           questionId,
           choiceId,
           correct: body.correct,

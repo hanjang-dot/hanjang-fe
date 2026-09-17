@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Cause, Effect, Exit } from "effect";
+import { useShallow } from "zustand/shallow";
 
 import { instrument } from "@/shared/instrumentation";
 
@@ -98,23 +99,37 @@ export const useExamSession = (
 };
 
 export const useActiveSession = (): ExamSession | null =>
-  useSessionStore(
-    (state) =>
-      Object.values(state.sessions).find(isLive) ?? null,
+  useSessionStore((state) =>
+    Object.values(state.sessions).find(isLive) ?? null,
   );
 
 export const useSession = (sessionId: string): ExamSession | null =>
   useSessionStore((state) => state.sessions[sessionId] ?? null);
 
 export const useGradedSessions = (): ExamSession[] =>
-  useSessionStore((state) =>
-    Object.values(state.sessions).filter(
-      (session) => session.status === "graded",
+  useSessionStore(
+    useShallow((state) =>
+      Object.values(state.sessions).filter(
+        (session) => session.status === "graded",
+      ),
     ),
   );
 
 export const useSessionGrades = (sessionId: string) =>
-  useSessionStore((state) => state.grades[sessionId] ?? {});
+  useSessionStore(useShallow((state) => state.grades[sessionId] ?? {}));
+
+const waitForRemoteId = async (
+  sessionId: string,
+  timeoutMs = 3000,
+): Promise<string | null> => {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const remoteId = useSessionStore.getState().sessions[sessionId]?.remoteId;
+    if (remoteId) return remoteId;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return null;
+};
 
 export const useGradeChoice = (
   session: ExamSession,
@@ -133,7 +148,7 @@ export const useGradeChoice = (
   const setGrade = useSessionStore((state) => state.setGrade);
 
   const choose = useCallback(
-    (choiceId: string) => {
+    async (choiceId: string) => {
       instrument.choiceTaps += 1;
       if (!hydrated) {
         instrument.choiceBlocked += 1;
@@ -143,8 +158,12 @@ export const useGradeChoice = (
         instrument.choiceBlocked += 1;
         return;
       }
-      if (!session.remoteId) {
-        setAnswer(session.sessionId, question.questionId, choiceId);
+      setVariant("grading");
+      const remoteId =
+        session.remoteId ??
+        (sessionClient ? await waitForRemoteId(session.sessionId) : null);
+      setAnswer(session.sessionId, question.questionId, choiceId);
+      if (!remoteId) {
         setVariant("graded");
         return;
       }
@@ -153,13 +172,12 @@ export const useGradeChoice = (
         runId,
         client.grade({
           runId,
-          examSessionId: session.remoteId,
+          examSessionId: remoteId,
           questionId: question.questionId,
           choiceId,
           correctChoiceId: question.correctChoiceId,
         }),
       );
-      setVariant("grading");
       run.fiber.addObserver((exit) => {
         if (!gate.isCurrent(run)) {
           instrument.droppedResults += 1;
@@ -172,7 +190,6 @@ export const useGradeChoice = (
             return;
           }
           instrument.appliedResults += 1;
-          setAnswer(session.sessionId, question.questionId, choiceId);
           setGrade(session.sessionId, result);
           setVariant("graded");
           return;

@@ -50,7 +50,7 @@ const Card = ({ onPress, ...props }: PropsWithChildren<CardProps>) => {
   }
   return (
     <Pressable
-      accessibilityRole="button"
+      accessible={false}
       onPress={onPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >

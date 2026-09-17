@@ -58,6 +58,7 @@ interface AuthState {
   signingIn: boolean;
   error: string | null;
   signInKakao: () => Promise<KakaoSignInStatus>;
+  signInWithTokens: (tokens: TokenPayload) => void;
   signOut: () => void;
 }
 
@@ -111,6 +112,9 @@ export const useAuthStore = create<AuthState>()(
           set({ signingIn: false, error: SIGN_IN_ERROR });
           throw error;
         }
+      },
+      signInWithTokens: (tokens) => {
+        applyTokens(set, tokens);
       },
       signOut: () => {
         const refreshToken = get().refreshToken;
