@@ -5,8 +5,6 @@ import { runOnJS } from "react-native-reanimated";
 
 import { instrument } from "@/shared/instrumentation";
 
-import { instrument } from "@/shared/instrumentation";
-
 import type { StrokePoint } from "@/features/session";
 import type { ReactNode } from "react";
 
