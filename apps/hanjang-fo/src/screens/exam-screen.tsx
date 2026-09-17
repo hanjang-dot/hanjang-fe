@@ -31,6 +31,7 @@ import {
   OfflineBanner,
   SkeletonCard,
 } from "@/shared/components";
+import { instrument } from "@/shared/instrumentation";
 
 interface ExamScreenProps {
   examId: string;
@@ -167,7 +168,13 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
                 )
               }
             />
-            <ScrollView style={styles.questions}>
+            <ScrollView
+              style={styles.questions}
+              onLayout={(event) => {
+                instrument.questionPaneWidth =
+                  event.nativeEvent.layout.width;
+              }}
+            >
               {data.questions.map((question) => (
                 <QuestionBlock
                   key={question.questionId}

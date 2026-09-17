@@ -2,20 +2,21 @@ import { useRef } from "react";
 import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { runOnJS } from "react-native-reanimated";
-import { StyleSheet } from "react-native-unistyles";
 
 import { instrument } from "@/shared/instrumentation";
 
 import type { StrokePoint } from "@/features/session";
+import type { ReactNode } from "react";
 
 const ACTIVATE_X = 8;
 const FAIL_Y = 8;
 
 interface InkLayerProps {
   onStroke: (points: StrokePoint[]) => void;
+  children: ReactNode;
 }
 
-const InkLayer = ({ onStroke }: InkLayerProps) => {
+const InkLayer = ({ onStroke, children }: InkLayerProps) => {
   const points = useRef<StrokePoint[]>([]);
   const begin = (x: number, y: number) => {
     instrument.strokeStarts += 1;
@@ -36,19 +37,9 @@ const InkLayer = ({ onStroke }: InkLayerProps) => {
     .onEnd(() => runOnJS(end)());
   return (
     <GestureDetector gesture={pan}>
-      <View style={styles.overlay} />
+      <View>{children}</View>
     </GestureDetector>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-});
 
 export default InkLayer;

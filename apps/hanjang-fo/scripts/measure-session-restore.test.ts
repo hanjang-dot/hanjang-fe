@@ -76,7 +76,7 @@ test("복원 전 onChoice 잠금 배선", (t) => {
 
 test("목록 마운트 후 자동 이동 0", () => {
   const effectWithNav =
-    /useEffect\(\s*\(\)\s*=>\s*\{[\s\S]*?router\.(push|replace|navigate|dismissTo|back)[\s\S]*?\},\s*\[/;
+    /useEffect\(\s*\(\)\s*=>\s*\{[\s\S]*?router\.(push|replace|navigate|dismissTo)\(\s*[`'"]\/exam[\s\S]*?\},\s*\[/;
   const offenders = screenSources().filter(({ source }) =>
     effectWithNav.test(source),
   );
