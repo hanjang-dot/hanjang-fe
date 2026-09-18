@@ -4,3 +4,7 @@ dist/
 *.tsbuildinfo
 .env
 .env.local
+
+# e2e maestro
+apps/hanjang-fo/maestro/.env.e2e
+apps/hanjang-fo/maestro/output/

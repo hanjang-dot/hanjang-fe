@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native-unistyles";
 import { Polyline, Svg } from "react-native-svg";
+
+import { instrument } from "@/shared/instrumentation";
 
 import InkLayer from "./ink-layer";
 import TiledPassageImage from "./tiled-passage-image";
@@ -27,42 +30,48 @@ const PassagePane = ({ questions, strokes, onStroke }: PassagePaneProps) => {
         style={styles.scroll}
         contentContainerStyle={styles.content}
         scrollEventThrottle={16}
-        onScroll={(event) => setScrollY(event.nativeEvent.contentOffset.y)}
+        onScroll={(event) => {
+          setScrollY(event.nativeEvent.contentOffset.y);
+          instrument.passageScrollY = event.nativeEvent.contentOffset.y;
+        }}
         onLayout={(event) =>
           setViewportHeight(event.nativeEvent.layout.height)
         }
       >
-        {questions.map((question) => (
-          <View key={question.questionId} style={styles.passage}>
-            <Text style={styles.number}>{question.number}번</Text>
-            {question.passageImageUrl ? (
-              <TiledPassageImage imageUrl={question.passageImageUrl} />
-            ) : question.passageImageHeight ? (
-              <TiledPassageImage
-                imageHeight={question.passageImageHeight}
-                scrollY={scrollY}
-                viewportHeight={viewportHeight}
-              />
-            ) : (
-              <Text style={styles.text}>{question.passage}</Text>
-            )}
+        <InkLayer onStroke={onStroke}>
+          <View style={styles.canvas}>
+            {questions.map((question) => (
+              <View key={question.questionId} style={styles.passage}>
+                <Text style={styles.number}>{question.number}번</Text>
+                {question.passageImageUrl ? (
+                  <TiledPassageImage imageUrl={question.passageImageUrl} />
+                ) : question.passageImageHeight ? (
+                  <TiledPassageImage
+                    imageHeight={question.passageImageHeight}
+                    scrollY={scrollY}
+                    viewportHeight={viewportHeight}
+                  />
+                ) : (
+                  <Text style={styles.text}>{question.passage}</Text>
+                )}
+              </View>
+            ))}
+            <Svg style={styles.ink} pointerEvents="none">
+              {strokes.map((stroke, index) => (
+                <Polyline
+                  key={index}
+                  points={toPolylinePoints(stroke.points)}
+                  fill="none"
+                  stroke={styles.inkStroke.color}
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              ))}
+            </Svg>
           </View>
-        ))}
+        </InkLayer>
       </ScrollView>
-      <Svg style={styles.ink} pointerEvents="none">
-        {strokes.map((stroke, index) => (
-          <Polyline
-            key={index}
-            points={toPolylinePoints(stroke.points)}
-            fill="none"
-            stroke={styles.inkStroke.color}
-            strokeWidth={2.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        ))}
-      </Svg>
-      <InkLayer onStroke={onStroke} />
     </View>
   );
 };
@@ -91,6 +100,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   passage: {
     gap: theme.spacing.sm,
+  },
+  canvas: {
+    position: "relative",
   },
   number: {
     ...theme.typography.label,

@@ -1,0 +1,31 @@
+url: ${BO_URL}
+env:
+  ADMIN_ID: "root"
+  ADMIN_PASSWORD: "hanjang-root-dev"
+---
+- launchApp:
+    clearState: true
+- runFlow: ../subflows/login.yaml
+- tapOn: "새 시험지"
+- assertVisible: "회차"
+- tapOn:
+    css: "#exam-round"
+- inputText: ${ROUND}
+- tapOn:
+    css: "#exam-subject"
+- inputText: "국어"
+- tapOn:
+    css: "#exam-year"
+- inputText: "2025"
+- tapOn:
+    css: "#exam-limit"
+- inputText: "60"
+- tapOn:
+    css: "button[type='submit']"
+- assertVisible: ${ROUND}
+- assertVisible: "문항"
+- tapOn: "발행"
+- extendedWaitUntil:
+    visible: "숨기기"
+    timeout: 15000
+- assertVisible: ".*발행됨.*"

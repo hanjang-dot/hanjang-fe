@@ -3,7 +3,12 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useExam, useExamPapers } from "@/features/exam";
-import { QuizSetCard } from "@/features/quiz";
+import {
+  EXPERIMENTS,
+  ReviewPromptCard,
+  useExperiment,
+} from "@/features/experiments";
+import { QuizSetCard, QuizStartBanner } from "@/features/quiz";
 import { useActiveSession } from "@/features/session";
 import {
   Button,
@@ -22,6 +27,7 @@ const HomeScreen = () => {
     activeSession?.examId ?? "",
     activeSession !== null,
   );
+  const homeStartCtaVariant = useExperiment(EXPERIMENTS.homeStartCta);
   const answeredCount = activeSession
     ? Object.keys(activeSession.answers).length
     : 0;
@@ -54,6 +60,7 @@ const HomeScreen = () => {
       style={styles.root}
       contentContainerStyle={styles.content}
     >
+      {homeStartCtaVariant === "B" ? <QuizStartBanner /> : null}
       {activeSession ? (
         <View style={styles.card}>
           <View style={styles.cardRow}>
@@ -82,7 +89,8 @@ const HomeScreen = () => {
           />
         </View>
       ) : null}
-      <QuizSetCard />
+      <ReviewPromptCard />
+      {homeStartCtaVariant === "A" ? <QuizSetCard /> : null}
       {!activeSession && papers.length === 0 ? (
         <EmptyState
           icon="inbox"

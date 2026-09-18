@@ -2,15 +2,22 @@ import { useState } from "react";
 
 import { useIsOffline } from "@/shared/hooks";
 import { Stack, useRouter } from "expo-router";
+import { useEffect } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import {
+  EXAM_TIMER_LAST_SECONDS,
   ExamTimer,
   PassagePane,
   QuestionBlock,
   useExam,
 } from "@/features/exam";
+import {
+  EXPERIMENTS,
+  trackExperimentEvent,
+  useExperiment,
+} from "@/features/experiments";
 import {
   useExamSession,
   useSessionStore,
@@ -24,6 +31,7 @@ import {
   OfflineBanner,
   SkeletonCard,
 } from "@/shared/components";
+import { instrument } from "@/shared/instrumentation";
 
 interface ExamScreenProps {
   examId: string;
@@ -37,6 +45,16 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
   const submitSession = useSessionStore((state) => state.submitSession);
   const addStroke = useSessionStore((state) => state.addStroke);
   const isOffline = useIsOffline();
+  const examTimerVariant = useExperiment(EXPERIMENTS.examTimer);
+  const sessionId = session?.sessionId;
+
+  useEffect(() => {
+    if (!sessionId) return;
+    trackExperimentEvent(EXPERIMENTS.examTimer, "exposure", {
+      examId,
+      sessionId,
+    });
+  }, [examId, sessionId]);
 
   const confirmExit = () =>
     Alert.alert("시험을 나갈까요?", "답안은 이 기기에 저장됩니다.", [
@@ -52,6 +70,10 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
 
   const submit = () => {
     if (!session || submitting) return;
+    trackExperimentEvent(EXPERIMENTS.examTimer, "conversion", {
+      examId,
+      sessionId: session.sessionId,
+    });
     setSubmitting(true);
     submitSession(session.sessionId)
       .catch(() => undefined)
@@ -101,7 +123,14 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
           headerShadowVisible: false,
           headerLeft,
           headerTitle: () =>
-            session ? <ExamTimer deadlineAt={session.deadlineAt} /> : null,
+            session ? (
+              <ExamTimer
+                deadlineAt={session.deadlineAt}
+                showBelowSec={
+                  examTimerVariant === "B" ? EXAM_TIMER_LAST_SECONDS : undefined
+                }
+              />
+            ) : null,
           headerRight,
           title: "",
         }}
@@ -139,7 +168,13 @@ const ExamScreen = ({ examId }: ExamScreenProps) => {
                 )
               }
             />
-            <ScrollView style={styles.questions}>
+            <ScrollView
+              style={styles.questions}
+              onLayout={(event) => {
+                instrument.questionPaneWidth =
+                  event.nativeEvent.layout.width;
+              }}
+            >
               {data.questions.map((question) => (
                 <QuestionBlock
                   key={question.questionId}

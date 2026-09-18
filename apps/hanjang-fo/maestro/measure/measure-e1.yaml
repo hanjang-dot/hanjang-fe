@@ -1,0 +1,151 @@
+appId: com.hanjang.fo
+---
+- launchApp:
+    clearState: true
+- openLink: "hanjang://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 60000
+- tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Fast refresh"
+    commands:
+      - tapOn: "Close"
+- extendedWaitUntil:
+    visible: "카카오로 시작"
+    timeout: 60000
+- openLink: "hanjang://auth/kakao?access=${MAESTRO_ACCESS_TOKEN}&refresh=${MAESTRO_REFRESH_TOKEN}"
+- extendedWaitUntil:
+    visible: "오늘의 퀴즈"
+    timeout: 30000
+- openLink: "hanjang://exam/236d3e1e-586e-4ece-816c-40e1e67fc905"
+- extendedWaitUntil:
+    visible: "E2E 긴지문 선택지 1-A"
+    timeout: 30000
+- openLink: "hanjang://debug"
+- extendedWaitUntil:
+    visible:
+      id: "instrument-reset"
+    timeout: 10000
+- tapOn:
+    id: "instrument-reset"
+- tapOn:
+    id: "debug-close"
+- extendedWaitUntil:
+    visible: "E2E 긴지문 선택지 1-A"
+    timeout: 10000
+- swipe:
+    start: "20%,25%"
+    end: "60%,25%"
+- swipe:
+    start: "60%,30%"
+    end: "20%,30%"
+- swipe:
+    start: "20%,35%"
+    end: "60%,35%"
+- swipe:
+    start: "60%,40%"
+    end: "20%,40%"
+- swipe:
+    start: "20%,25%"
+    end: "60%,25%"
+- swipe:
+    start: "60%,30%"
+    end: "20%,30%"
+- swipe:
+    start: "20%,35%"
+    end: "60%,35%"
+- swipe:
+    start: "60%,40%"
+    end: "20%,40%"
+- swipe:
+    start: "20%,25%"
+    end: "60%,25%"
+- swipe:
+    start: "60%,30%"
+    end: "20%,30%"
+- swipe:
+    start: "20%,35%"
+    end: "60%,35%"
+- swipe:
+    start: "60%,40%"
+    end: "20%,40%"
+- swipe:
+    start: "20%,25%"
+    end: "60%,25%"
+- swipe:
+    start: "60%,30%"
+    end: "20%,30%"
+- swipe:
+    start: "20%,35%"
+    end: "60%,35%"
+- swipe:
+    start: "60%,40%"
+    end: "20%,40%"
+- swipe:
+    start: "20%,25%"
+    end: "60%,25%"
+- swipe:
+    start: "60%,30%"
+    end: "20%,30%"
+- swipe:
+    start: "20%,35%"
+    end: "60%,35%"
+- swipe:
+    start: "60%,40%"
+    end: "20%,40%"
+- openLink: "hanjang://debug"
+- copyTextFrom:
+    id: "instrument-stroke-starts"
+- assertTrue: ${parseInt(maestro.copiedText) >= 20}
+- evalScript: ${output.strokesAfterPans = maestro.copiedText}
+- copyTextFrom:
+    id: "instrument-passage-scroll-y"
+- assertTrue: ${parseFloat(maestro.copiedText) === 0}
+- copyTextFrom:
+    id: "instrument-question-pane-width"
+- evalScript: ${output.paneWidthLong = maestro.copiedText}
+- tapOn:
+    id: "debug-close"
+- swipe:
+    start: "40%,45%"
+    end: "40%,20%"
+- openLink: "hanjang://debug"
+- copyTextFrom:
+    id: "instrument-passage-scroll-y"
+- assertTrue: ${parseFloat(maestro.copiedText) > 0}
+- tapOn:
+    id: "debug-close"
+- assertVisible: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- tapOn: "E2E 긴지문 선택지 1-A"
+- openLink: "hanjang://debug"
+- copyTextFrom:
+    id: "instrument-choice-taps"
+- assertTrue: ${parseInt(maestro.copiedText) === 10}
+- copyTextFrom:
+    id: "instrument-stroke-starts"
+- assertTrue: ${maestro.copiedText === output.strokesAfterPans}
+- copyTextFrom:
+    id: "instrument-tile-decodes"
+- evalScript: ${output.tileDecodes = maestro.copiedText}
+- tapOn:
+    id: "debug-close"
+- openLink: "hanjang://exam/bb0bc797-422c-403c-a324-61e543e6ad59"
+- extendedWaitUntil:
+    visible: "E2E 선택지 1-A"
+    timeout: 30000
+- openLink: "hanjang://debug"
+- copyTextFrom:
+    id: "instrument-question-pane-width"
+- assertTrue: ${Math.abs(parseFloat(maestro.copiedText) - parseFloat(output.paneWidthLong)) <= 1}
+- takeScreenshot: measure-e1-debug

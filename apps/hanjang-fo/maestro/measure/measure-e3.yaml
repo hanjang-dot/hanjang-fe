@@ -1,0 +1,114 @@
+appId: com.hanjang.fo
+---
+- launchApp:
+    clearState: true
+- openLink: "hanjang://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 60000
+- tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Fast refresh"
+    commands:
+      - tapOn: "Close"
+- extendedWaitUntil:
+    visible: "카카오로 시작"
+    timeout: 60000
+- openLink: "hanjang://auth/kakao?access=${MAESTRO_ACCESS_TOKEN}&refresh=${MAESTRO_REFRESH_TOKEN}"
+- extendedWaitUntil:
+    visible: "오늘의 퀴즈"
+    timeout: 30000
+- openLink: "hanjang://exam/bb0bc797-422c-403c-a324-61e543e6ad59"
+- extendedWaitUntil:
+    visible: "E2E 선택지 1-A"
+    timeout: 30000
+- tapOn: "E2E 선택지 1-A"
+- extendedWaitUntil:
+    visible:
+      id: "sheet-variant-graded"
+    timeout: 15000
+- openLink: "hanjang://debug"
+- extendedWaitUntil:
+    visible:
+      id: "instrument-sessions"
+    timeout: 10000
+- tapOn:
+    id: "instrument-restore-delay"
+- copyTextFrom:
+    id: "instrument-sessions"
+- evalScript: ${output.sessionsBefore = maestro.copiedText}
+- copyTextFrom:
+    id: "instrument-choice-taps"
+- evalScript: ${output.tapsBefore = maestro.copiedText}
+- killApp
+- launchApp
+- openLink: "hanjang://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+- runFlow:
+    when:
+      visible: "Fast refresh"
+    commands:
+      - tapOn: "Close"
+- runFlow:
+    when:
+      visible: "카카오로 시작"
+    commands:
+      - openLink: "hanjang://auth/kakao?access=${MAESTRO_ACCESS_TOKEN}&refresh=${MAESTRO_REFRESH_TOKEN}"
+- extendedWaitUntil:
+    visible: "오늘의 퀴즈"
+    timeout: 30000
+- assertNotVisible: "제출"
+- openLink: "hanjang://exam/bb0bc797-422c-403c-a324-61e543e6ad59"
+- assertNotVisible: "E2E 선택지 1-A"
+- tapOn:
+    point: "200,640"
+- tapOn:
+    point: "200,640"
+- extendedWaitUntil:
+    visible: "E2E 선택지 1-A"
+    timeout: 30000
+- openLink: "hanjang://debug"
+- extendedWaitUntil:
+    visible:
+      id: "instrument-sessions"
+    timeout: 10000
+- copyTextFrom:
+    id: "instrument-choice-taps"
+- assertTrue: ${maestro.copiedText === "0"}
+- copyTextFrom:
+    id: "instrument-hydrated"
+- evalScript: ${output.hydratedAfter = maestro.copiedText}
+- copyTextFrom:
+    id: "instrument-sessions"
+- evalScript: ${output.after = JSON.parse(maestro.copiedText); output.before = JSON.parse(output.sessionsBefore)}
+- evalScript: ${output.beforeSession = Object.values(output.before).find((s) => s.examId === "bb0bc797-422c-403c-a324-61e543e6ad59")}
+- evalScript: ${output.afterSession = Object.values(output.after).find((s) => s.examId === "bb0bc797-422c-403c-a324-61e543e6ad59")}
+- assertTrue: ${output.afterSession !== undefined && output.afterSession !== null}
+- assertTrue: ${JSON.stringify(output.afterSession.answers) === JSON.stringify(output.beforeSession.answers)}
+- assertTrue: ${output.afterSession.deadlineAt === output.beforeSession.deadlineAt}
+- assertTrue: ${output.afterSession.deadlineAt - Date.now() > 0}
+- evalScript: ${output.restoredStatus = output.afterSession.status}
+- tapOn:
+    id: "debug-close"
+- tapOn: "E2E 선택지 1-B"
+- extendedWaitUntil:
+    visible:
+      id: "sheet-variant-graded"
+    timeout: 15000
+- openLink: "hanjang://debug"
+- copyTextFrom:
+    id: "instrument-choice-blocked"
+- evalScript: ${output.blockedOnRestore = maestro.copiedText}
+- copyTextFrom:
+    id: "instrument-choice-taps"
+- assertTrue: ${maestro.copiedText === "1"}
+- copyTextFrom:
+    id: "instrument-sessions"
+- evalScript: ${output.after2 = Object.values(JSON.parse(maestro.copiedText)).find((s) => s.examId === "bb0bc797-422c-403c-a324-61e543e6ad59")}
+- evalScript: ${output.tapAccepted = JSON.stringify(output.after2.answers) !== JSON.stringify(output.beforeSession.answers)}
+- takeScreenshot: measure-e3-debug

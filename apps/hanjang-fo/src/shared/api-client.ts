@@ -1,6 +1,7 @@
 import { createHanjangApi } from "@hanjang/api";
 
 import { API_BASE_URL } from "./config";
+import { instrument } from "./instrumentation";
 
 import type { TokenPayload } from "@hanjang/api";
 
@@ -32,6 +33,10 @@ export const hanjangApi = API_BASE_URL
       baseUrl: API_BASE_URL,
       getAccessToken: () => accessToken,
       getDeviceId: () => deviceId,
+      getTestHeaders: (): Record<string, string> =>
+        instrument.gradeDelayMs > 0
+          ? { "x-test-delay": String(instrument.gradeDelayMs) }
+          : {},
       refreshTokens: () => {
         if (!refreshHandler) return Promise.reject(new Error("no refresh handler"));
         return refreshHandler();

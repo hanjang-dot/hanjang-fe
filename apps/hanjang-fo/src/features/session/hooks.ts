@@ -1,8 +1,12 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Cause, Effect, Exit } from "effect";
-import { useShallow } from "zustand/react/shallow";
+import { useShallow } from "zustand/shallow";
+
+import { instrument } from "@/shared/instrumentation";
 
 import { gradeClient as defaultGradeClient, sessionClient } from "./api";
+import { RESTORE_DELAY_STORAGE_KEY } from "./constants";
 import { initSessionTable, loadSessions } from "./db";
 import { createGradeGate } from "./grade-run";
 import { remoteDetailToLocal, useSessionStore } from "./store";
@@ -62,14 +66,25 @@ const syncRemoteSessions = async () => {
 export const useHydrateSessions = () => {
   const hydrate = useSessionStore((state) => state.hydrate);
   useEffect(() => {
-    try {
-      initSessionTable();
-      hydrate(loadSessions());
-    } catch (error) {
-      console.warn("session restore failed", error);
-      hydrate([]);
-    }
-    void syncRemoteSessions();
+    void (async () => {
+      try {
+        const restoreDelay = await AsyncStorage.getItem(
+          RESTORE_DELAY_STORAGE_KEY,
+        );
+        if (restoreDelay) {
+          await AsyncStorage.removeItem(RESTORE_DELAY_STORAGE_KEY);
+          await new Promise((resolve) =>
+            setTimeout(resolve, parseInt(restoreDelay, 10)),
+          );
+        }
+        initSessionTable();
+        hydrate(loadSessions());
+      } catch (error) {
+        console.warn("session restore failed", error);
+        hydrate([]);
+      }
+      void syncRemoteSessions();
+    })();
   }, [hydrate]);
 };
 
@@ -97,9 +112,8 @@ export const useExamSession = (
 };
 
 export const useActiveSession = (): ExamSession | null =>
-  useSessionStore(
-    (state) =>
-      Object.values(state.sessions).find(isLive) ?? null,
+  useSessionStore((state) =>
+    Object.values(state.sessions).find(isLive) ?? null,
   );
 
 export const useSession = (sessionId: string): ExamSession | null =>
@@ -114,10 +128,21 @@ export const useGradedSessions = (): ExamSession[] =>
     ),
   );
 
-const EMPTY_GRADES = {};
-
 export const useSessionGrades = (sessionId: string) =>
-  useSessionStore((state) => state.grades[sessionId] ?? EMPTY_GRADES);
+  useSessionStore(useShallow((state) => state.grades[sessionId] ?? {}));
+
+const waitForRemoteId = async (
+  sessionId: string,
+  timeoutMs = 3000,
+): Promise<string | null> => {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const remoteId = useSessionStore.getState().sessions[sessionId]?.remoteId;
+    if (remoteId) return remoteId;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return null;
+};
 
 export const useGradeChoice = (
   session: ExamSession,
@@ -136,11 +161,22 @@ export const useGradeChoice = (
   const setGrade = useSessionStore((state) => state.setGrade);
 
   const choose = useCallback(
-    (choiceId: string) => {
-      if (!hydrated) return;
-      if (variant === "grading") return;
-      if (!session.remoteId) {
-        setAnswer(session.sessionId, question.questionId, choiceId);
+    async (choiceId: string) => {
+      instrument.choiceTaps += 1;
+      if (!hydrated) {
+        instrument.choiceBlocked += 1;
+        return;
+      }
+      if (variant === "grading") {
+        instrument.choiceBlocked += 1;
+        return;
+      }
+      setVariant("grading");
+      const remoteId =
+        session.remoteId ??
+        (sessionClient ? await waitForRemoteId(session.sessionId) : null);
+      setAnswer(session.sessionId, question.questionId, choiceId);
+      if (!remoteId) {
         setVariant("graded");
         return;
       }
@@ -149,19 +185,24 @@ export const useGradeChoice = (
         runId,
         client.grade({
           runId,
-          examSessionId: session.remoteId,
+          examSessionId: remoteId,
           questionId: question.questionId,
           choiceId,
           correctChoiceId: question.correctChoiceId,
         }),
       );
-      setVariant("grading");
       run.fiber.addObserver((exit) => {
-        if (!gate.isCurrent(run)) return;
+        if (!gate.isCurrent(run)) {
+          instrument.droppedResults += 1;
+          return;
+        }
         if (Exit.isSuccess(exit)) {
           const result = exit.value;
-          if (result.runId !== run.runId) return;
-          setAnswer(session.sessionId, question.questionId, choiceId);
+          if (result.runId !== run.runId) {
+            instrument.droppedResults += 1;
+            return;
+          }
+          instrument.appliedResults += 1;
           setGrade(session.sessionId, result);
           setVariant("graded");
           return;

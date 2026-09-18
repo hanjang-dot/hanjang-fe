@@ -38,6 +38,7 @@ const RootLayout = () => (
       <Stack.Screen name="exam-result/[session-id]" />
       <Stack.Screen name="quiz" />
       <Stack.Screen name="quiz-result" />
+      <Stack.Screen name="debug" />
     </Stack>
   </AppProviders>
 );

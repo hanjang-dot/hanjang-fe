@@ -30,7 +30,7 @@ const QuestionBlock = ({ session, question }: QuestionBlockProps) => {
   return (
     <View
       style={styles.block}
-      testID={`sheet-variant-${grade ? "graded" : variant}`}
+      testID={`sheet-variant-${variant}`}
     >
       <Text style={styles.prompt}>{question.prompt}</Text>
       <View style={styles.choices}>
@@ -40,7 +40,9 @@ const QuestionBlock = ({ session, question }: QuestionBlockProps) => {
             session.answers[question.questionId] === choice.choiceId;
           const revealed = grade !== null;
           const isAnswer =
-            revealed && choice.choiceId === question.correctChoiceId;
+            revealed &&
+            (choice.choiceId === question.correctChoiceId ||
+              (picked && grade?.correct === true));
           return (
             <ChoiceButton
               key={choice.choiceId}

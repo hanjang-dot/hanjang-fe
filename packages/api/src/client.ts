@@ -50,6 +50,7 @@ export interface HanjangApiOptions {
   baseUrl: string;
   getAccessToken?: () => string | null;
   getDeviceId?: () => string | null;
+  getTestHeaders?: () => Record<string, string>;
   refreshTokens?: () => Promise<TokenPayload>;
   onUnauthorized?: () => void;
 }
@@ -65,6 +66,11 @@ export const createHanjangApi = (options: HanjangApiOptions) => {
             state.request.headers.set("Authorization", `Bearer ${token}`);
           const deviceId = options.getDeviceId?.();
           if (deviceId) state.request.headers.set("x-device-id", deviceId);
+          for (const [key, value] of Object.entries(
+            options.getTestHeaders?.() ?? {},
+          )) {
+            state.request.headers.set(key, value);
+          }
         },
       ],
     },

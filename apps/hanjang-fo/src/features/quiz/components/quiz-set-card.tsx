@@ -5,16 +5,26 @@ import { StyleSheet } from "react-native-unistyles";
 import { useTodayQuizSet } from "../hooks";
 import { useQuizRunStore } from "../store";
 
+import {
+  EXPERIMENTS,
+  trackExperimentEvent,
+  useExperiment,
+} from "@/features/experiments";
+
 const QuizSetCard = () => {
   const router = useRouter();
   const { data } = useTodayQuizSet();
   const begin = useQuizRunStore((state) => state.begin);
+  const variant = useExperiment(EXPERIMENTS.homeStartCta);
   const start = () => {
+    trackExperimentEvent(EXPERIMENTS.homeStartCta, "conversion", { variant });
     begin(data?.quizzes.map((quiz) => quiz.quizId) ?? []);
     router.push("/quiz");
   };
   return (
     <Pressable
+      accessible
+      accessibilityLabel="오늘의 퀴즈"
       accessibilityRole="button"
       onPress={start}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
