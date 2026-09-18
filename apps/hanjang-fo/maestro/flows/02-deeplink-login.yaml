@@ -1,0 +1,7 @@
+appId: com.hanjang.fo
+---
+- runFlow: ../_setup.yaml
+- assertVisible: "카카오로 시작"
+- takeScreenshot: 01-login
+- runFlow: ../_signin.yaml
+- takeScreenshot: 02-home

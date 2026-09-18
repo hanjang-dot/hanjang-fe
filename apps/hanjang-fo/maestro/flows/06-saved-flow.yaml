@@ -1,0 +1,16 @@
+appId: com.hanjang.fo
+---
+- runFlow: ../_setup.yaml
+- runFlow: ../_signin.yaml
+- tapOn: "자료실"
+- extendedWaitUntil:
+    visible: "2026학년도 E2E 모의고사"
+    timeout: 10000
+- tapOn:
+    text: "북마크"
+    below: "2026학년도 E2E 모의고사"
+- tapOn: "저장"
+- extendedWaitUntil:
+    visible: "2026학년도 E2E 모의고사"
+    timeout: 10000
+- takeScreenshot: 06-saved

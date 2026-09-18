@@ -1,0 +1,23 @@
+appId: com.hanjang.fo
+---
+- runFlow: ../_setup.yaml
+- runFlow: ../_signin.yaml
+- extendedWaitUntil:
+    visible: "자료실"
+    timeout: 10000
+- tapOn: "자료실"
+- extendedWaitUntil:
+    visible: "2026학년도 E2E 모의고사"
+    timeout: 10000
+- tapOn: "2026학년도 E2E 모의고사"
+- extendedWaitUntil:
+    visible: "다음 중 조선시대의 왕은?"
+    timeout: 10000
+- takeScreenshot: 04-exam-question
+- tapOn: "세종대왕"
+- tapOn: "제출"
+- extendedWaitUntil:
+    visible: "결과"
+    timeout: 15000
+- assertVisible: "자료실로"
+- takeScreenshot: 04-exam-result

@@ -1,0 +1,17 @@
+appId: com.hanjang.fo
+---
+- runFlow: ../_setup.yaml
+- runFlow: ../_signin.yaml
+- tapOn: "자료실"
+- assertVisible: "E2E 모의고사"
+- takeScreenshot: 03-library
+- tapOn: "저장"
+- takeScreenshot: 03-saved
+- tapOn: "복습"
+- takeScreenshot: 03-review
+- tapOn: "마이"
+- assertVisible: "계정"
+- assertVisible: "로그아웃"
+- takeScreenshot: 03-my
+- tapOn: "한장"
+- assertVisible: "오늘의 퀴즈"

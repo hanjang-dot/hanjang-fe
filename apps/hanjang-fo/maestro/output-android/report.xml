@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="hanjang_api36" tests="7" failures="0" time="470.028" timestamp="2026-09-16T23:34:54">
+    <testcase id="04-exam-flow" name="04-exam-flow" classname="04-exam-flow" file="flows/04-exam-flow.yaml" time="57.028" timestamp="2026-09-16T23:34:54" status="SUCCESS"/>
+    <testcase id="02-deeplink-login" name="02-deeplink-login" classname="02-deeplink-login" file="flows/02-deeplink-login.yaml" time="43.212" timestamp="2026-09-16T23:35:51" status="SUCCESS"/>
+    <testcase id="05-quiz-flow" name="05-quiz-flow" classname="05-quiz-flow" file="flows/05-quiz-flow.yaml" time="124.343" timestamp="2026-09-16T23:36:35" status="SUCCESS"/>
+    <testcase id="06-saved-flow" name="06-saved-flow" classname="06-saved-flow" file="flows/06-saved-flow.yaml" time="61.117" timestamp="2026-09-16T23:38:39" status="SUCCESS"/>
+    <testcase id="03-tabs" name="03-tabs" classname="03-tabs" file="flows/03-tabs.yaml" time="68.951" timestamp="2026-09-16T23:39:40" status="SUCCESS"/>
+    <testcase id="01-login-render" name="01-login-render" classname="01-login-render" file="flows/01-login-render.yaml" time="45.162" timestamp="2026-09-16T23:40:49" status="SUCCESS"/>
+    <testcase id="07-logout" name="07-logout" classname="07-logout" file="flows/07-logout.yaml" time="70.173" timestamp="2026-09-16T23:41:34" status="SUCCESS"/>
+  </testsuite>
+</testsuites>
